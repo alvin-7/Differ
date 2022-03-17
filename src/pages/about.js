@@ -1,7 +1,6 @@
-import React, { useEffect } from 'react'
+import React, { useEffect } from 'react';
 
 export default () => {
-  useEffect(()=>{}, []);
+  useEffect(() => {}, []);
   return <div>about</div>;
 };
-

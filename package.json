@@ -19,7 +19,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "electron-dev": "electron ."
+    "electron": "electron ."
   },
   "eslintConfig": {
     "extends": [
@@ -40,6 +40,7 @@
     ]
   },
   "devDependencies": {
-    "electron": "^17.1.2"
+    "electron": "^17.1.2",
+    "electron-reloader": "^1.2.3"
   }
 }
