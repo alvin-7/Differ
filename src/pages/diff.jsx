@@ -19,12 +19,18 @@ const ExcelDiff = () => {
   const [sheetIdx, setSheetIdx] = useState('');
   const [sheetIdxs, setSheetIdxs] = useState([]);
 
-  if (window?.ipcRenderer) {
-    window.ipcRenderer.send('ipc_diff')
-    window.ipcRenderer.on('ipc_env_argv', (e, msg) => {
-      const argv = msg
-      console.log(argv)
+  console.log('00000')
+  if (window?.electron?.ipcRenderer) {
+    const ipc = window.electron.ipcRenderer
+    console.log('1111', ipc)
+    ipc.invoke('ipc_diff').then((sheets) => {
+      console.log('result', sheets)
     })
+    // ipc.send('ipc_diff')
+    // ipc.on('ipc_env_argv', (e, msg) => {
+    //   const argv = msg
+    //   console.log('222', argv)
+    // })
   }
 
   const SHEET_TYPE = {
