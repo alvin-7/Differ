@@ -19,7 +19,13 @@ const ExcelDiff = () => {
   const [sheetIdx, setSheetIdx] = useState('');
   const [sheetIdxs, setSheetIdxs] = useState([]);
 
-  console.log(window?.electron)
+  if (window?.ipcRenderer) {
+    window.ipcRenderer.send('ipc_diff')
+    window.ipcRenderer.on('ipc_env_argv', (e, msg) => {
+      const argv = msg
+      console.log(argv)
+    })
+  }
 
   const SHEET_TYPE = {
     SRC: ['file_src', setLeftSheets, setLeftTitle],

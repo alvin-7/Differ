@@ -1,7 +1,5 @@
-const { contextBridge, ipcRenderer, remote, shell } = require('electron');
+const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electron', {
   ipcRenderer,
-  remote,
-  shell,
 });
