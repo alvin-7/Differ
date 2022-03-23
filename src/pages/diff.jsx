@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Row, Col, Button, Radio } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
-// import {createPatch} from 'diff';
-// import {parse, html} from 'diff2html';
-// import 'diff2html/bundles/css/diff2html.min.css';
 import xlsx from 'node-xlsx';
 import ReactDiffViewer from 'react-diff-viewer';
+// import fs from 'fs'
 import './diff.less'
 
 
@@ -19,9 +17,6 @@ const ExcelDiff = () => {
   const [rightStr, setRightStr] = useState('');
   const [sheetIdx, setSheetIdx] = useState('');
   const [sheetIdxs, setSheetIdxs] = useState([]);
-
-
-  // const argv = this.$electron.remote.process.argv
 
   const SHEET_TYPE = {
     SRC: ['file_src', setLeftSheets, setLeftTitle],
@@ -46,16 +41,6 @@ const ExcelDiff = () => {
     return diffString
   }
 
-
-  // useEffect(() => {
-  //   const idxs = new Set()
-  //   for (const sheet of [...leftSheets, ...rightSheets]) {
-  //     idxs.add(sheet.name)
-  //   }
-  //   setSheetIdxs(idxs)
-  //   const idx = idxs.size ? idxs.keys().next().value : ''
-  //   setSheetIdx(idx)
-  // }, [leftSheets, rightSheets])
 
   useEffect(() => {
     const idxs = new Set()
