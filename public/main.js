@@ -9,11 +9,18 @@ const url = require('url')
 let mainWindow
 
 const isDev = 'ELECTRON_IS_DEV' in process.env ? process.env.ELECTRON_IS_DEV === 1 : !app.isPackaged;
-process.env.electron_is_dev = isDev
 
 function createWindow() {
     //创建浏览器窗口,宽高自定义具体大小你开心就好
-    mainWindow = new BrowserWindow({ width: 800, height: 600 })
+    mainWindow = new BrowserWindow({ 
+        width: 800, 
+        height: 600,
+        webPreferences: {
+            nodeIntegration: false,
+            webSecurity: false,
+            preload: path.join(__dirname, 'preload.js'),
+        }, 
+    })
     // 加载应用----- electron-quick-start中默认的加载入口
     if (isDev) {
         // 加载应用----适用于 react 项目

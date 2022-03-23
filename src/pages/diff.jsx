@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Row, Col, Button, Radio } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import xlsx from 'node-xlsx';
-import ReactDiffViewer from 'react-diff-viewer';
+import DiffComponent from 'react-diff-viewer';
+// import DiffComponent from "react-code-diff-lite";
 // import fs from 'fs'
 import './diff.less'
 
@@ -17,6 +18,8 @@ const ExcelDiff = () => {
   const [rightStr, setRightStr] = useState('');
   const [sheetIdx, setSheetIdx] = useState('');
   const [sheetIdxs, setSheetIdxs] = useState([]);
+
+  console.log(window?.electron)
 
   const SHEET_TYPE = {
     SRC: ['file_src', setLeftSheets, setLeftTitle],
@@ -104,6 +107,23 @@ const ExcelDiff = () => {
   const indexChange = (e) => {
     setSheetIdx(e.target.value)
   }
+  const styles={
+    diffContainer: {
+      overflowX: 'auto',
+      // overflowX: "auto",
+      // // maxWidth: 300
+      // display: "block",
+      // "& pre": { whiteSpace: "pre" },
+    },
+    diffRemoved: {
+        overflowX: 'auto',
+        maxWidth: 300,
+    },
+    diffAdded: {
+        overflowX: 'auto',
+        maxWidth: 300,
+    },
+  }
 
   return (
     <React.Fragment>
@@ -128,8 +148,8 @@ const ExcelDiff = () => {
         </Col>
       </Row>
       {
-        leftStr && <ReactDiffViewer oldValue={leftStr} newValue={rightStr} splitView={true} leftTitle={leftTitle} rightTitle={rightTitle} 
-        renderContent={inputSyntax} showDiffOnly={true} />
+        leftStr && <DiffComponent oldValue={leftStr} newValue={rightStr} splitView={true} leftTitle={leftTitle} rightTitle={rightTitle} 
+        renderContent={inputSyntax} showDiffOnly={true} styles={styles}/>
       }
     </React.Fragment>
   );

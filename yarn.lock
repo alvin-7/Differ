@@ -4010,7 +4010,7 @@ diff-sequences@^27.5.1:
   resolved "https://registry.yarnpkg.com/diff-sequences/-/diff-sequences-27.5.1.tgz#eaecc0d327fd68c8d9672a1e64ab8dccb2ef5327"
   integrity sha512-k1gCAXAsNgLwEL+Y8Wvl+M6oEFj5bgazfZULpS5CneoPPXRaCCW7dm+q21Ky2VEE5X+VeRDBVg1Pcvvsr4TtNQ==
 
-diff2html@^3.4.16:
+diff2html@^3.4.0, diff2html@^3.4.16:
   version "3.4.16"
   resolved "https://registry.npmmirror.com/diff2html/-/diff2html-3.4.16.tgz#3d27e88594fa0e1ab954cc11e90895f9fa7b002d"
   integrity sha512-KfkvEoZTJertjoGPYFLn8n0yRdvzJcHvFJpJwbIxUlHU9x6qqhRZEM+TlgtU09jdLqRZAQyWFoxPiP6HeT2IYA==
@@ -8519,6 +8519,14 @@ react-app-polyfill@^3.0.0:
     raf "^3.4.1"
     regenerator-runtime "^0.13.9"
     whatwg-fetch "^3.6.2"
+
+react-code-diff-lite@^1.0.12:
+  version "1.0.12"
+  resolved "https://registry.npmmirror.com/react-code-diff-lite/-/react-code-diff-lite-1.0.12.tgz#b2d2312672d935752d39965eaa536ec08fc2a7af"
+  integrity sha512-FRuANzuyCbk7pVKRNskDqa+vSflfEY6PnS3uq5eHkQPs0Y6TJLxrAaIW6CTaHQI5GrUHAoXex4C6dyQz8qMz6Q==
+  dependencies:
+    diff "^5.0.0"
+    diff2html "^3.4.0"
 
 react-dev-utils@^12.0.0:
   version "12.0.0"
