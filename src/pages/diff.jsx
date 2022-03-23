@@ -15,9 +15,12 @@ const ExcelDiff = () => {
   const [rightSheets, setRightSheets] = useState([]);
   const [leftTitle, setLeftTitle] = useState('');
   const [rightTitle, setRightTitle] = useState('');
-  const [leftStr, setStrSrc] = useState('');
-  const [rightStr, setStrDiff] = useState('');
-  const [sheetIdx, setSheetIdx] = useState(0);
+  const [leftStr, setLeftStr] = useState('');
+  const [rightStr, setRightStr] = useState('');
+  const [sheetIdx, setSheetIdx] = useState('');
+  const [sheetIdxs, setSheetIdxs] = useState([]);
+
+
   // const argv = this.$electron.remote.process.argv
 
   const SHEET_TYPE = {
@@ -26,28 +29,54 @@ const ExcelDiff = () => {
   }
 
   function getDiffStr(sheetsStr, sheetIdx) {
-    let srcStr = ''
-    for (const line of sheetsStr[sheetIdx]?.data || []) {
+    let diffString = ''
+    const sheet = sheetsStr.find(c=>(c.name === sheetIdx)) || []
+    for (const line of sheet?.data || []) {
       if (line.length > 0) {
-        srcStr += line[0] ? line[0] : '&*'
+        diffString += line[0] ? line[0] : '&*'
         for (let i=1; i<line.length; i++) {
           const s = line[i] ? line[i] : '&*'
-          srcStr += '~' + s
+          diffString += '~' + s
         }
       } else {
-        srcStr += '&*'
+        diffString += '&*'
       }
-      srcStr += '\n'
+      diffString += '\n'
     }
-    return srcStr
+    return diffString
   }
 
+
+  // useEffect(() => {
+  //   const idxs = new Set()
+  //   for (const sheet of [...leftSheets, ...rightSheets]) {
+  //     idxs.add(sheet.name)
+  //   }
+  //   setSheetIdxs(idxs)
+  //   const idx = idxs.size ? idxs.keys().next().value : ''
+  //   setSheetIdx(idx)
+  // }, [leftSheets, rightSheets])
+
   useEffect(() => {
-    const leftStr = getDiffStr(leftSheets, sheetIdx)
-    const rightStr = getDiffStr(rightSheets, sheetIdx)
-    setStrSrc(leftStr)
-    setStrDiff(rightStr)
-  }, [leftSheets, rightSheets, sheetIdx])
+    const idxs = new Set()
+    for (const sheet of [...leftSheets, ...rightSheets]) {
+      idxs.add(sheet.name)
+    }
+    setSheetIdxs([...idxs])
+    if (!sheetIdx) {
+      const idx = idxs.size ? idxs.keys().next().value : ''
+      setSheetIdx(idx)
+    }
+
+    function refreshTable() {
+      const left = getDiffStr(leftSheets, sheetIdx)
+      const right = getDiffStr(rightSheets, sheetIdx)
+      setLeftStr(left)
+      setRightStr(right)
+    }
+
+    refreshTable()
+  }, [sheetIdx, leftSheets, rightSheets])
 
   const getFilds = (idName) =>{
     return () => {
@@ -70,7 +99,6 @@ const ExcelDiff = () => {
   }
 
   const inputSyntax = (str) => {
-    console.log(str)
     const strs = str ? str.split('~') : []
     let result = ""
     for (let s of strs) {
@@ -87,20 +115,23 @@ const ExcelDiff = () => {
       />
     )
   };
-
+  
   const indexChange = (e) => {
     setSheetIdx(e.target.value)
   }
 
   return (
     <React.Fragment>
-      <Radio.Group defaultValue='0' buttonStyle="solid" onChange={indexChange}>
-        {
-          leftSheets.map((c, idx) =>
-            <Radio.Button value={idx}>{c.name}</Radio.Button>
-          )
-        }
-      </Radio.Group>
+      {
+        sheetIdx &&
+        <Radio.Group defaultValue={sheetIdx} buttonStyle="solid" onChange={indexChange}>
+          {
+            sheetIdxs.map((element) =>
+              <Radio.Button value={element} key={element}>{element}</Radio.Button>
+            )
+          }
+        </Radio.Group>
+      }
       <Row>
         <Col span={12}>
           <input id={SHEET_TYPE.SRC[0]} type='file' accept=".xls,.xlsx" style={{display:'none'}} onChange={fileInputChange(SHEET_TYPE.SRC[1], SHEET_TYPE.SRC[2])}></input>
