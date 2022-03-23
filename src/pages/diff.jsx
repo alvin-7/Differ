@@ -3,8 +3,6 @@ import { Row, Col, Button, Radio } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import xlsx from 'node-xlsx';
 import DiffComponent from 'react-diff-viewer';
-// import DiffComponent from "react-code-diff-lite";
-// import fs from 'fs'
 import './diff.less'
 
 
@@ -19,18 +17,15 @@ const ExcelDiff = () => {
   const [sheetIdx, setSheetIdx] = useState('');
   const [sheetIdxs, setSheetIdxs] = useState([]);
 
-  console.log('00000')
   if (window?.electron?.ipcRenderer) {
     const ipc = window.electron.ipcRenderer
-    console.log('1111', ipc)
     ipc.invoke('ipc_diff').then((sheets) => {
-      console.log('result', sheets)
+      if (!sheets?.length) return
+      const leftSheet = window.electron.xlsx.parse(sheets[0])
+      setLeftSheets(leftSheet)
+      const rightSheet = window.electron.xlsx.parse(sheets[1])
+      setRightSheets(rightSheet)
     })
-    // ipc.send('ipc_diff')
-    // ipc.on('ipc_env_argv', (e, msg) => {
-    //   const argv = msg
-    //   console.log('222', argv)
-    // })
   }
 
   const SHEET_TYPE = {
