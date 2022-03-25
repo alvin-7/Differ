@@ -5,7 +5,7 @@
   "description": "My Electron application description",
   "main": ".webpack/main",
   "scripts": {
-    "start": "electron-forge start",
+    "start": "electron-forge start -- a=C:/Users/Admin/Desktop/GDE_Account_exp_bak.xlsx b=C:/Users/Admin/Desktop/GDE_Account_exp_bak.xlsx",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
