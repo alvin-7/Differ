@@ -1,3 +1,4 @@
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Table } from 'antd';
 import { Row, Col, Divider } from 'antd';
 import './excel.less'
@@ -10,10 +11,10 @@ const columns = [
   {
     title: 'Name',
     dataIndex: 'name',
-    render: function (text, now, index) {
-      console.log(text, now, index)
-      return <a>{text}</a>
-    }
+    // render: function (text, now, index) {
+    //   console.log(text, now, index)
+    //   return <a>{text}</a>
+    // }
   },
   {
     title: 'Chinese Score',
@@ -80,16 +81,16 @@ function onChange(pagination, filters, sorter, extra) {
 const Home = () => {
   return (
     <>
-    <Divider orientation="left">Excel Differ</Divider>
-    <Row gutter={10} wrap={false}>
-      <Col span={12}>
-        <Table className='leftTable' columns={columns} dataSource={data} onChange={onChange} />,
-      </Col>
-      {/* <Col span={1}></Col> */}
-      <Col span={12} >
-        <Table className='rightTable' columns={columns} dataSource={data} onChange={onChange} />
-      </Col>
-    </Row>
+      <Divider orientation="left">Excel Differ</Divider>
+      <Row gutter={10} wrap={false}>
+        <Col span={12}>
+          <Table className='leftTable' columns={columns} dataSource={data} onChange={onChange} />,
+        </Col>
+        {/* <Col span={1}></Col> */}
+        <Col span={12} >
+          <Table className='rightTable' columns={columns} dataSource={data} onChange={onChange} />
+        </Col>
+      </Row>
     </>
   )
 }
