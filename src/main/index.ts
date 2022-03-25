@@ -20,13 +20,12 @@ const createWindow = (): void => {
     width: 800,
     webPreferences: {
       nodeIntegration: true,
-      contextIsolation:false,
-      // preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
+      contextIsolation: true,
+      preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
       // preload: path.join(__dirname, 'preload.js')
     }
   });
 
-  console.log('main', MAIN_WINDOW_WEBPACK_ENTRY, MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY)
   // and load the index.html of the app.
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 

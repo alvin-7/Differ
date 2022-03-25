@@ -9,7 +9,8 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
-    "lint": "eslint --ext .ts,.tsx ."
+    "lint": "eslint --ext .ts,.tsx .",
+    "debug": "electron-forge start --inspect-electron"
   },
   "keywords": [],
   "author": {
@@ -53,7 +54,10 @@
                 {
                   "html": "./src/renderer/index.html",
                   "js": "./src/renderer/index.tsx",
-                  "name": "main_window"
+                  "name": "main_window",
+                  "preload": {
+                    "js": "./src/preload.js"
+                  }
                 }
               ]
             },

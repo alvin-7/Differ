@@ -1,7 +1,7 @@
 
 export interface IElectronAPI {
   ipcRenderer: any,
-  readXlsx: (path: string) => any[],
+  readXlsx: (path: string|ArrayBuffer) => any[],
 }
 
 declare global {
