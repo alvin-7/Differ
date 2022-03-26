@@ -9,6 +9,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     let excelPaths = path === '' ? [] : [path]
     if (path === '') {
       const argv = process.argv
+      console.log('process', process)
       console.log('argv', argv)
       for (let i=0; i<argv.length; i++) {
         if (argv[i] === '--excel') {
