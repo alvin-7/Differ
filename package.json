@@ -5,12 +5,13 @@
   "description": "My Electron application description",
   "main": ".webpack/main",
   "scripts": {
-    "start": "electron-forge start --inspect-electron -- --excel C:/Users/Wenzhen/Desktop/新建 XLSX 工作表.xlsx --excel C:/Users/Wenzhen/Desktop/新建 XLSX 工作表 - 副本.xlsx",
+    "start": "electron-forge start --",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
     "lint": "eslint --ext .ts,.tsx .",
-    "debug": "electron-forge start --inspect-electron"
+    "debug": "electron-forge start -- --inspect=7778",
+    "debug-brk": "electron-forge start -- --inspect-brk=7778"
   },
   "keywords": [],
   "author": {
