@@ -1,6 +1,6 @@
 import * as React from 'react';
-import CodeDiffer from './pages/diff';
 import { Layout, Menu  } from 'antd';
+import CodeDiffer from './pages/diff';
 
 const { Header, Content, Footer } = Layout;
 

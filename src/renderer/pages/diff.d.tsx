@@ -1,6 +1,7 @@
+import { IpcRenderer } from 'electron';
 
 export interface IElectronAPI {
-  ipcRenderer: any,
+  ipcRenderer: IpcRenderer,
   readXlsx: (path: string|ArrayBuffer) => any[],
 }
 

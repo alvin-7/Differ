@@ -5,27 +5,9 @@ import fs from 'fs'
 contextBridge.exposeInMainWorld('electronAPI', {
   ipcRenderer,
   readXlsx: (path) => {
-    const sheets = []
-    let excelPaths = path === '' ? [] : [path]
-    if (path === '') {
-      const argv = process.argv
-      console.log('process', process)
-      console.log('argv', argv)
-      for (let i=0; i<argv.length; i++) {
-        if (argv[i] === '--excel') {
-          excelPaths.push(argv[i+1])
-          excelPaths.push(argv[i+2])
-          break
-        }
-      }
-      if (!excelPaths.length) return sheets
+    if (typeof path === 'string') {
+      path = fs.readFileSync(path)
     }
-    for (let path of excelPaths) {
-      if (typeof path === 'string') {
-        path = fs.readFileSync(path)
-      }
-      sheets.push(xlsx.parse(path))
-    }
-    return sheets
+    return xlsx.parse(path)
   }
 });

@@ -1,7 +1,6 @@
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Row, Col, Button, Radio } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
-// import xlsx from 'node-xlsx';
 import DiffComponent, { ReactDiffViewerStylesOverride } from 'react-diff-viewer';
 import './diff.less'
 
@@ -34,17 +33,16 @@ const ExcelDiff = () => {
 
   if (!entryTryReadExcel) {
     entryTryReadExcel = true
-    console.log('11111111')
-    const sheets = window.electronAPI.readXlsx('')
-    console.log(sheets)
-    if (sheets.length) {
-      setLeftSheets(sheets[0])
-      setRightSheets(sheets[1])
-    }
-    // const ipc = window?.electron?.ipcRenderer
-    // ipc.invoke('ipc_excel_handle').then((sheets: Array<any>) => {
-    //   if (!sheets?.length) return
-    // })
+    const ipc = window.electronAPI.ipcRenderer
+    ipc.invoke('ipc_excel_paths').then((excelPaths: string[]) => {
+      if (excelPaths.length) {
+        console.log('render', excelPaths)
+        let excelSheet = window.electronAPI.readXlsx(excelPaths[0])
+        setLeftSheets(excelSheet)
+        excelSheet = window.electronAPI.readXlsx(excelPaths[1])
+        setRightSheets(excelSheet)
+      }
+    })
   }
 
 
@@ -115,8 +113,7 @@ const ExcelDiff = () => {
       reader.readAsArrayBuffer(fileData)
       reader.onload = function() {
         const excelSheet = window.electronAPI.readXlsx(this.result)
-        // const excel_sheets = xlsx.parse(this.result)
-        setSheet(excelSheet[0])
+        setSheet(excelSheet)
         setTitle(fileData.name)
       }
     }

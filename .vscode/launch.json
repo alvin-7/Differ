@@ -14,9 +14,7 @@
             },
             // runtimeArgs will be passed directly to your Electron application
             "runtimeArgs": [
-                "--excel",
-                "C:/Users/Admin/Desktop/GDE_Account_exp_bak.xlsx",
-                "C:/Users/Admin/Desktop/GDE_Account_exp_bak.xlsx",
+                "--excel C:/Users/Wenzhen/Desktop/新建 XLSX 工作表.xlsx --excel C:/Users/Wenzhen/Desktop/新建 XLSX 工作表 - 副本.xlsx",
             ],
             "cwd": "${workspaceFolder}"
         }

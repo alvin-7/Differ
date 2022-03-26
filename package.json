@@ -5,7 +5,7 @@
   "description": "My Electron application description",
   "main": ".webpack/main",
   "scripts": {
-    "start": "electron-forge start",
+    "start": "electron-forge start -- --excel C:/Users/Wenzhen/Desktop/新建 XLSX 工作表.xlsx --excel C:/Users/Wenzhen/Desktop/新建 XLSX 工作表 - 副本.xlsx",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
