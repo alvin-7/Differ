@@ -20,7 +20,7 @@ const App = () => {
       <Content>
         <Layout className="site-layout-background" style={{ padding: '24px 0' }}>
           <Content style={{ padding: '0 24px', minHeight: 280 }}>
-            <CodeDiffer></CodeDiffer>
+            <CodeDiffer/>
           </Content>
         </Layout>
       </Content>

@@ -18,6 +18,8 @@ interface ExcelData {
 
 type SetterFunction<T> = Dispatch<SetStateAction<T>>
 
+let entryTryReadExcel = false;
+
 const ExcelDiff = () => {
 
   const [leftSheets, setLeftSheets] = useState([]);
@@ -28,8 +30,6 @@ const ExcelDiff = () => {
   const [rightStr, setRightStr] = useState('');
   const [sheetIdx, setSheetIdx] = useState('');
   const [sheetIdxs, setSheetIdxs] = useState([]);
-
-  let entryTryReadExcel = false;
 
   if (!entryTryReadExcel) {
     entryTryReadExcel = true
@@ -161,14 +161,13 @@ const ExcelDiff = () => {
   return (
     <React.Fragment>
       {
-        sheetIdx &&
-        <Radio.Group defaultValue={sheetIdx} buttonStyle="solid" onChange={indexChange}>
+        sheetIdx ? (<Radio.Group defaultValue={sheetIdx} buttonStyle="solid" onChange={indexChange}>
           {
             sheetIdxs.map((element) =>
               <Radio.Button value={element} key={element}>{element}</Radio.Button>
             )
           }
-        </Radio.Group>
+        </Radio.Group>) : null
       }
       <Row>
         <Col span={12}>
@@ -181,8 +180,8 @@ const ExcelDiff = () => {
         </Col>
       </Row>
       {
-        leftStr && <DiffComponent oldValue={leftStr} newValue={rightStr} splitView={true} leftTitle={leftTitle} rightTitle={rightTitle} 
-        renderContent={inputSyntax} showDiffOnly={true} styles={styles}/>
+        leftStr ? (<DiffComponent oldValue={leftStr} newValue={rightStr} splitView={true} leftTitle={leftTitle} rightTitle={rightTitle} 
+        renderContent={inputSyntax} showDiffOnly={true} styles={styles}/>) : null
       }
     </React.Fragment>
   );
