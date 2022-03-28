@@ -187,9 +187,15 @@ const TableDiff = () => {
       if (excelPaths.length) {
         console.log('render', excelPaths)
         const datas = window.electronAPI.readXlsx(excelPaths[0])
+        const rightDatas = window.electronAPI.readXlsx(excelPaths[1])
+
         const columns: {[key: string]: {[key:string]: string|number}} = {}
         const data = []
         const sheets = Object.keys(datas)
+
+        console.log('orgin data', datas[sheets[0]], rightDatas[sheets[0]])
+        const diffData = window.electronAPI.diffArrays(datas[sheets[0]].map((v, idx)=>idx+JSON.stringify(v)), rightDatas[sheets[0]].map((v,idx)=>idx+JSON.stringify(v)))
+        console.log('diffData:', diffData)
 
         for (let i=0; i<datas[sheets[0]].length; i++) { 
           const itemD = datas[sheets[0]][i]

@@ -75,6 +75,7 @@
     "@electron-forge/maker-squirrel": "^6.0.0-beta.63",
     "@electron-forge/maker-zip": "^6.0.0-beta.63",
     "@electron-forge/plugin-webpack": "6.0.0-beta.63",
+    "@types/diff": "^5.0.2",
     "@types/react": "^17.0.43",
     "@types/react-dom": "^17.0.14",
     "@types/react-window": "^1.8.5",
@@ -97,6 +98,7 @@
   "dependencies": {
     "@reduxjs/toolkit": "^1.8.0",
     "antd": "^4.19.3",
+    "diff": "^5.0.0",
     "electron-squirrel-startup": "^1.0.0",
     "killport2": "^1.0.4",
     "node-xlsx": "^0.21.0",

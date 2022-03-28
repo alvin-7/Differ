@@ -2,6 +2,7 @@ import { contextBridge, ipcRenderer } from 'electron';
 // import xlsx from 'node-xlsx';
 import fs from 'fs'
 import * as XLSX from 'xlsx/xlsx.mjs';
+import { diffArrays } from 'diff';
 
 
 XLSX.set_fs(fs)
@@ -25,5 +26,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
       datas[sheet] = XLSX.utils.sheet_to_json(workbook.Sheets[sheet])
     }
     return datas
+  },
+  diffArrays: (leftData, rightData) => {
+    return diffArrays(leftData, rightData)
   }
 });
