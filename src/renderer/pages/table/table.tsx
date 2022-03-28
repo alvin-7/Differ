@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState, useRef, useLayoutEffect } from "react";
 import { Table, Row, Col } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 
@@ -105,17 +105,45 @@ for (let i = 0; i < 100; i++) {
 let first = true
 
 const TableDiff = () => {
+  const listHeight = useRef<HTMLHeadingElement>(null)
   const [columns, setColumns] = useState([])
   const [data, setData] = useState([])
-  const ipc = window.electronAPI.ipcRenderer
+
+  useLayoutEffect(() => {
+    console.log(listHeight?.current?.clientHeight)
+  })
+
   if (first) {
-    first = true
+    first = false 
+    const ipc = window.electronAPI.ipcRenderer
     ipc.invoke('ipc_excel_paths').then((excelPaths: string[]) => {
       console.log(excelPaths)
       if (excelPaths.length) {
         console.log('render', excelPaths)
-        const workbook = window.electronAPI.readXlsx(excelPaths[0])
-        console.log('exceljs sheet', workbook)
+        const datas = window.electronAPI.readXlsx(excelPaths[0])
+        const c: {[key: string]: {[key:string]: string|number}} = {}
+        const d = []
+        const sheets = Object.keys(datas)
+        for (const data of datas[sheets[0]]) {
+          const keys = Object.keys(data)
+          const dItem: {[key:string]: string|number} = {}
+          for (const k of keys) {
+            dItem[k] = data[k]
+            if (k in c) continue
+            c[k] = {
+              title: k,
+              dataIndex: k,
+              key: k,
+              fixed: 'left'
+            }
+          }
+          d.push(dItem)
+        }
+        console.log('exceljs sheet', datas)
+        console.log('xxx', c)
+        console.log('yyy', d)
+        setColumns(Object.values(c))
+        setData(d)
       }
     })
   }
@@ -131,13 +159,13 @@ const TableDiff = () => {
           tableLayout="fixed"
         ></Table>
       </Col>
-      <Col span={12}>
+      <Col span={12} ref={listHeight}>
         <Table
           columns={columns}
           dataSource={data}
           bordered
           size="middle"
-          scroll={{ x: 'calc(50%)', y: 340 }}
+          scroll={{ x: 'calc(50%)', y: listHeight?.current?.clientHeight | 340 }}
           tableLayout="fixed"
         ></Table>
       </Col>
