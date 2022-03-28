@@ -30,6 +30,11 @@ const createWindow = (): void => {
 
   // Open the DevTools.
   isDev && mainWindow.webContents.openDevTools();
+
+  mainWindow.on('resize', () => {
+    const sizeData = mainWindow.getContentSize()
+    mainWindow.webContents.send('resized', sizeData)
+  })
 };
 
 // This method will be called when Electron has finished
@@ -55,7 +60,9 @@ app.on('ready', () => {
     if (excelPath) paths.push(excelPath)
     return paths
   });
+
 });
+
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits

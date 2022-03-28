@@ -7,7 +7,7 @@ import * as XLSX from 'xlsx/xlsx.mjs';
 XLSX.set_fs(fs)
 
 contextBridge.exposeInMainWorld('electronAPI', {
-  ipcRenderer,
+  ipcRenderer: {...ipcRenderer, on: ipcRenderer.on.bind(ipcRenderer)},
   // readXlsx: (path) => {
   //   if (typeof path === 'string') {
   //     path = fs.readFileSync(path)

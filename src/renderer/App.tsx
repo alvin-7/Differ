@@ -3,11 +3,16 @@ import { Layout, Menu  } from 'antd';
 // import CodeDiffer from './pages/diff/diff';
 import TableDiff from './pages/table/table';
 
+import { useAppSelector, useAppDispatch } from './redux/hooks';
+import type { RootState } from './redux/store';
+import { setterLayout } from './redux/setter/layoutSetter'
+
 const { Header, Content, Footer } = Layout;
 
 import './App.less';
 
 const App = () => {
+
   return (
     <Layout style={{minHeight: '100vh'}}>
       <Header className="header">
