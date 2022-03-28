@@ -1,115 +1,9 @@
 // import React, { Dispatch, SetStateAction, useEffect, useState, useRef, useLayoutEffect } from "react";
-import { Row, Col } from 'antd';
-// import { ColumnsType } from 'antd/es/table';
-
-
-// const columns: ColumnsType = [
-//   {
-//     title: 'Name',
-//     dataIndex: 'name',
-//     key: 'name',
-//     width: 100,
-//     fixed: 'left',
-//     filters: [
-//       {
-//         text: 'Joe',
-//         value: 'Joe',
-//       },
-//       {
-//         text: 'John',
-//         value: 'John',
-//       },
-//     ],
-//     onFilter: (value: string | number | boolean, record: any) => record.name.indexOf(value) === 0,
-//   },
-//   {
-//     title: 'Other',
-//     children: [
-//       {
-//         title: 'Age',
-//         dataIndex: 'age',
-//         key: 'age',
-//         width: 150,
-//         // sorter: (a: any, b: any) => a.age - b.age,
-//       },
-//       {
-//         title: 'Address',
-//         children: [
-//           {
-//             title: 'Street',
-//             dataIndex: 'street',
-//             key: 'street',
-//             width: 150,
-//           },
-//           {
-//             title: 'Block',
-//             children: [
-//               {
-//                 title: 'Building',
-//                 dataIndex: 'building',
-//                 key: 'building',
-//                 width: 100,
-//               },
-//               {
-//                 title: 'Door No.',
-//                 dataIndex: 'number',
-//                 key: 'number',
-//                 width: 100,
-//               },
-//             ],
-//           },
-//         ],
-//       },
-//     ],
-//   },
-//   {
-//     title: 'Company',
-//     children: [
-//       {
-//         title: 'Company Address',
-//         dataIndex: 'companyAddress',
-//         key: 'companyAddress',
-//         width: 200,
-//       },
-//       {
-//         title: 'Company Name',
-//         dataIndex: 'companyName',
-//         key: 'companyName',
-//       },
-//     ],
-//   },
-//   {
-//     title: 'Gender',
-//     dataIndex: 'gender',
-//     key: 'gender',
-//     width: 80,
-//     fixed: 'right',
-//   },
-// ];
-
-// const data: object[] = [];
-// for (let i = 0; i < 100; i++) {
-//   data.push({
-//     key: i,
-//     name: 'John Brown',
-//     age: i + 1,
-//     street: 'Lake Park',
-//     building: 'C',
-//     number: 2035,
-//     companyAddress: 'Lake Street 42',
-//     companyName: 'SoftLake Co',
-//     gender: 'M',
-//   });
-// }
-
-// let first = true
-
-
+import { Row, Col, Table } from 'antd';
 import React, { useState, useEffect, useRef } from 'react';
 import { VariableSizeGrid as Grid } from 'react-window';
 import ResizeObserver from 'rc-resize-observer';
 import classNames from 'classnames';
-import { Table } from 'antd';
 
 function VirtualTable(props: Parameters<typeof Table>[0]) {
   const { columns, scroll } = props;
@@ -215,22 +109,6 @@ function VirtualTable(props: Parameters<typeof Table>[0]) {
   );
 }
 
-// Usage
-// const columns = [
-//   { title: 'A', dataIndex: 'key' },
-//   { title: 'B', dataIndex: 'key' },
-//   { title: 'C', dataIndex: 'key' },
-//   { title: 'D', dataIndex: 'key' },
-//   { title: 'E', dataIndex: 'key' },
-//   { title: 'F', dataIndex: 'key' },
-// ];
-
-// const data = Array.from({ length: 100000 }, (_, key) => ({ key }));
-
-// ReactDOM.render(
-//   <VirtualTable columns={columns} dataSource={data} scroll={{ y: 300, x: '100vw' }} />,
-//   mountNode,
-// );
 
 /**
  * 获取第一个表格的可视化高度
@@ -309,7 +187,7 @@ const TableDiff = () => {
       if (excelPaths.length) {
         console.log('render', excelPaths)
         const datas = window.electronAPI.readXlsx(excelPaths[0])
-        const c: {[key: string]: {[key:string]: string|number}} = {}
+        const columns: {[key: string]: {[key:string]: string|number}} = {}
         const data = []
         const sheets = Object.keys(datas)
 
@@ -318,11 +196,16 @@ const TableDiff = () => {
           const keys = Object.keys(itemD)
           const dItem: {[key:string]: string|number} = {}
           for (const k of keys) {
+            const width = (itemD[k]+'').length * 10
             dItem[k] = itemD[k]
-            if (k in c) continue
-            c[k] = {
+            if (k in columns) {
+              columns[k].width = Math.max(+columns[k].width, width)
+              continue
+            }
+            columns[k] = {
               title: k.search("_EMPTY") !== -1 ? "" : k,
               dataIndex: k,
+              width: width
               // key: k,
               // fixed: 'left'
             }
@@ -331,14 +214,15 @@ const TableDiff = () => {
           data.push(dItem)
         }
         console.log('exceljs sheet', datas)
-        console.log('xxx', c)
-        console.log('yyy', data)
-        setColumns(Object.values(c))
+        console.log('columns', columns)
+        console.log('data', data)
+        setColumns(Object.values(columns))
         setData(data)
       }
     })
   }
   return (
+    columns && data ?
     <Row>
       <Col span={12}>
         <VirtualTable
@@ -359,7 +243,7 @@ const TableDiff = () => {
           // size="middle"
           // scroll={{ x: '100vw', y: '100vh' }}
           // tableLayout="fixed"
-          scroll={{ y: 1000, x: '100vw' }}
+          scroll={{ y: 1000, x: 500 }}
           tableLayout='auto'
           rowClassName={(record, index) => {
             console.log(index)
@@ -367,18 +251,7 @@ const TableDiff = () => {
           }}
         ></VirtualTable>
       </Col>
-      {/* <Col span={12}>
-        <VirtualTable
-          columns={columns}
-          dataSource={data}
-          // bordered
-          // size="middle"
-          scroll={{ x: '100vw', y: 'max-content' }}
-          tableLayout="fixed"
-        ></VirtualTable>
-      </Col> */}
-    </Row>
-  //  <VirtualTable columns={columns} dataSource={data} scroll={{ y: 300, x: '100vw' }} />
+    </Row> : null
   );
 }
 
