@@ -1,6 +1,5 @@
 const rules = require('./webpack.rules');
 const plugins = require('./webpack.plugins');
-const { options } = require('less');
 
 rules.push({
   test: /\.less$/,

@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Layout, Menu  } from 'antd';
-import CodeDiffer from './pages/diff';
+// import CodeDiffer from './pages/diff/diff';
+import TableDiff from './pages/table/table';
 
 const { Header, Content, Footer } = Layout;
 
@@ -20,7 +21,8 @@ const App = () => {
       <Content>
         <Layout className="site-layout-background" style={{ padding: '24px 0' }}>
           <Content style={{ padding: '0 24px', minHeight: 280 }}>
-            <CodeDiffer/>
+            {/* <CodeDiffer/> */}
+            <TableDiff></TableDiff>
           </Content>
         </Layout>
       </Content>

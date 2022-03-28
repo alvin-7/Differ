@@ -10,22 +10,5 @@
             "request": "attach",
             "type": "node",
             "webRoot": "${workspaceFolder}"
-        },
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "Electron Main222",
-
-            "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron-forge-vscode-nix",
-            "windows": {
-                "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron-forge-vscode-win"
-            },
-            // runtimeArgs will be passed directly to your Electron application
-            "runtimeArgs": [
-                "foo1",
-                "bar"
-            ],
-            "cwd": "${workspaceFolder}"
-        }
-    ]
+        }    ]
 }

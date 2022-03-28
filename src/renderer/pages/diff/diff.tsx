@@ -4,10 +4,14 @@ import { UploadOutlined } from '@ant-design/icons';
 import DiffComponent, { ReactDiffViewerStylesOverride } from 'react-diff-viewer';
 import './diff.less'
 
+interface SHEET_SETTER_TYPE {
+  name: string;
+  data: unknown[];
+}
 
 interface SHEET_ITEM_TYPE {
   name: string,
-  sheetSetter: SetterFunction<any[]>,
+  sheetSetter: SetterFunction<SHEET_SETTER_TYPE[]>,
   titleSetter: SetterFunction<string>,
 }
 
@@ -36,11 +40,11 @@ const ExcelDiff = () => {
     const ipc = window.electronAPI.ipcRenderer
     ipc.invoke('ipc_excel_paths').then((excelPaths: string[]) => {
       if (excelPaths.length) {
-        console.log('render', excelPaths)
-        let excelSheet = window.electronAPI.readXlsx(excelPaths[0])
-        setLeftSheets(excelSheet)
-        excelSheet = window.electronAPI.readXlsx(excelPaths[1])
-        setRightSheets(excelSheet)
+        // console.log('render', excelPaths)
+        // let excelSheet = window.electronAPI.readXlsx(excelPaths[0])
+        // setLeftSheets(excelSheet)
+        // excelSheet = window.electronAPI.readXlsx(excelPaths[1])
+        // setRightSheets(excelSheet)
       }
     })
   }
@@ -106,15 +110,15 @@ const ExcelDiff = () => {
     }
   }
 
-  const fileInputChange = (setSheet: any, setTitle: any) => {
+  const fileInputChange = (setSheet: SetterFunction<SHEET_SETTER_TYPE[]>, setTitle: SetterFunction<string>,) => {
     return (event: any) => {
       const fileData = event.target.files[0]
       const reader = new FileReader()
       reader.readAsArrayBuffer(fileData)
       reader.onload = function() {
-        const excelSheet = window.electronAPI.readXlsx(this.result)
-        setSheet(excelSheet)
-        setTitle(fileData.name)
+        // const excelSheet = window.electronAPI.readXlsx(this.result)
+        // setSheet(excelSheet)
+        // setTitle(fileData.name)
       }
     }
   }
