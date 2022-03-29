@@ -98,6 +98,7 @@
   "dependencies": {
     "@reduxjs/toolkit": "^1.8.0",
     "antd": "^4.19.3",
+    "deep-object-diff": "^1.1.7",
     "diff": "^5.0.0",
     "electron-squirrel-startup": "^1.0.0",
     "killport2": "^1.0.4",

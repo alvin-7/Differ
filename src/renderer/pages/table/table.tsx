@@ -153,6 +153,7 @@ const TableDiff = () => {
   // const listHeight = useRef<HTMLDivElement>(null)
   const [columns, setColumns] = useState([])
   const [data, setData] = useState([])
+  const [diff, setDiff] = useState({})
   const [scrollY, setScrollY] = useState("")
     //页面加载完成后才能获取到对应的元素及其位置
   useEffect(() => {
@@ -189,27 +190,30 @@ const TableDiff = () => {
         const datas = window.electronAPI.readXlsx(excelPaths[0])
         const rightDatas = window.electronAPI.readXlsx(excelPaths[1])
 
+        console.log('datas', datas, rightDatas)
         const columns: {[key: string]: {[key:string]: string|number}} = {}
         const data = []
-        const sheets = Object.keys(datas)
+        const sheetNames = Object.keys(datas)
 
-        console.log('orgin data', datas[sheets[0]], rightDatas[sheets[0]])
-        const diffData = window.electronAPI.diffArrays(datas[sheets[0]].map((v, idx)=>idx+JSON.stringify(v)), rightDatas[sheets[0]].map((v,idx)=>idx+JSON.stringify(v)))
-        console.log('diffData:', diffData)
+        console.log('orgin data', datas[sheetNames[0]], rightDatas[sheetNames[0]])
+        const diffData = window.electronAPI.diffArrays(datas[sheetNames[0]], rightDatas[sheetNames[0]])
+        console.log(diffData  )
+        diffData && setDiff(diffData)
 
-        for (let i=0; i<datas[sheets[0]].length; i++) { 
-          const itemD = datas[sheets[0]][i]
+        for (let i=1; i<datas[sheetNames[0]].length; i++) { 
+          const itemD = datas[sheetNames[0]][i]
           const keys = Object.keys(itemD)
           const dItem: {[key:string]: string|number} = {}
           for (const k of keys) {
-            const width = (itemD[k]+'').length * 10
+            const cArr = itemD[k].match(/[^x00-xff]/ig);
+            const width = ((itemD[k]+'').length + (cArr ? cArr.length : 0)) * 10
             dItem[k] = itemD[k]
             if (k in columns) {
               columns[k].width = Math.max(+columns[k].width, width)
               continue
             }
             columns[k] = {
-              title: k.search("_EMPTY") !== -1 ? "" : k,
+              title: k,
               dataIndex: k,
               width: width
               // key: k,

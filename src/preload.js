@@ -3,9 +3,32 @@ import { contextBridge, ipcRenderer } from 'electron';
 import fs from 'fs'
 import * as XLSX from 'xlsx/xlsx.mjs';
 import { diffArrays } from 'diff';
+import { diff } from 'deep-object-diff';
 
 
 XLSX.set_fs(fs)
+
+function SheetToJson(workbookSheets) {
+  const columnReg = new RegExp(/(^[A-Z]*)([0-9]*$)/)
+  const sheets = {}
+  for (const sheetName in workbookSheets) {
+    const sheetData = workbookSheets[sheetName]
+    const rowsData = []
+    for (const colKey in sheetData) {
+      if (colKey.startsWith('!')) continue
+      const matchRst = colKey.match(columnReg)
+      const row = matchRst[2] - 1
+      const col = matchRst[1]
+      if (!(row in rowsData)) rowsData[row] = {}
+      rowsData[row][col] = sheetData[colKey].v + ''
+    }
+    for (let i=0; i<rowsData.length; i++) {
+      if (!rowsData[i]) rowsData[i] = {}
+    }
+    sheets[sheetName] = rowsData
+  }
+  return sheets
+}
 
 contextBridge.exposeInMainWorld('electronAPI', {
   ipcRenderer: {...ipcRenderer, on: ipcRenderer.on.bind(ipcRenderer)},
@@ -21,13 +44,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
       data = fs.readFileSync(path)
     }
     const workbook = XLSX.read(data)
-    const datas = {}
-    for (const sheet in workbook.Sheets) {
-      datas[sheet] = XLSX.utils.sheet_to_json(workbook.Sheets[sheet])
-    }
+    const datas = SheetToJson(workbook.Sheets)
     return datas
   },
   diffArrays: (leftData, rightData) => {
-    return diffArrays(leftData, rightData)
+    return diff(leftData, rightData)
   }
 });
