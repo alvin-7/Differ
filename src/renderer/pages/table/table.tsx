@@ -215,7 +215,10 @@ const TableDiff = () => {
             columns[k] = {
               title: k,
               dataIndex: k,
-              width: width
+              width: width,
+              render: function() {
+
+              }
               // key: k,
               // fixed: 'left'
             }
