@@ -216,9 +216,6 @@ const TableDiff = () => {
               title: k,
               dataIndex: k,
               width: width,
-              render: function() {
-
-              }
               // key: k,
               // fixed: 'left'
             }
