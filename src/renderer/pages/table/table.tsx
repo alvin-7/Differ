@@ -197,7 +197,7 @@ const TableDiff = () => {
 
         console.log('orgin data', datas[sheetNames[0]], rightDatas[sheetNames[0]])
         const diffData = window.electronAPI.diffArrays(datas[sheetNames[0]], rightDatas[sheetNames[0]])
-        console.log(diffData  )
+        console.log('diffData', diffData  )
         diffData && setDiff(diffData)
 
         for (let i=1; i<datas[sheetNames[0]].length; i++) { 

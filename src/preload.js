@@ -48,6 +48,29 @@ contextBridge.exposeInMainWorld('electronAPI', {
     return datas
   },
   diffArrays: (leftData, rightData) => {
-    return diff(leftData, rightData)
+    const sampleDiff = diffArrays(leftData.map((v)=>JSON.stringify(v)), rightData.map((v)=>JSON.stringify(v)))
+    let remove = null
+    const diffObj = {}
+    for (const diffItem of sampleDiff) {
+      const obj = diffItem.value.map(v => {
+        return JSON.parse(v)
+      })
+      if (diffItem.removed) {
+        remove = obj
+      } else if (diffItem.added) {
+        console.log('diffitem', diffItem)
+        if (remove) {
+          Object.assign(diffObj, diff(remove, obj))
+        } else {
+          console.log(diff([], obj))
+          Object.assign(diffObj, diff([], obj))
+        }
+      } else if (remove) {
+          Object.assign(diffObj, diff({}, obj))
+      }
+      remove = null
+    }
+    // return diff(leftData, rightData)
+    return diffObj
   }
 });
