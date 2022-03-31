@@ -90,8 +90,8 @@ function itemRenderWrap(diff: diffType, rowKey: string, left = true) {
     if (!text) return text
     const key = record.key
     if (key in diff && diff[key] && rowKey in diff[key]) {
-      if (left) return <text className='row-item-left-highlight'>{text}</text>
-      else return <text className='row-item-right-highlight'>{text}</text>
+      if (left) return <div className='row-item-left-highlight'>{text}</div>
+      else return <div className='row-item-right-highlight'>{text}</div>
     }
     return text
   }
@@ -112,23 +112,23 @@ function bindTableScrollEvent() {
   const rightTable = document.querySelector(".rightTable .ant-table-body")
   let scrollLock = false
   leftTable.addEventListener('scroll', function () {
-    if ((leftTable.scrollLeft == rightTable.scrollLeft && leftTable.scrollTop == rightTable.scrollTop) || scrollLock) {
+    if (scrollLock || (leftTable.scrollLeft === rightTable.scrollLeft && leftTable.scrollTop === rightTable.scrollTop)) {
       return
     }
     scrollLock = true
     rightTable.scrollLeft = leftTable.scrollLeft
     rightTable.scrollTop = leftTable.scrollTop
     scrollLock = false
-  }, true)
+  })
   rightTable.addEventListener('scroll', function () {
-    if ((leftTable.scrollLeft == rightTable.scrollLeft && leftTable.scrollTop == rightTable.scrollTop) || scrollLock) {
+    if (scrollLock || (leftTable.scrollLeft === rightTable.scrollLeft && leftTable.scrollTop === rightTable.scrollTop)) {
       return
     }
     scrollLock = true
     leftTable.scrollLeft = rightTable.scrollLeft
     leftTable.scrollTop = rightTable.scrollTop
     scrollLock = false
-  }, true)
+  })
 }
 
 let first = true
@@ -199,7 +199,9 @@ const TableDiff = () => {
             pagination={{ 
               current: page,
               pageSize: MAX_PAGE_SIZE,
-              onChange: (page: number, pageSize: number) => setPage(page)
+              hideOnSinglePage: true,
+              showSizeChanger: false,
+              onChange: (page: number) => setPage(page)
             }}
             bordered
             // size="middle"
@@ -217,7 +219,9 @@ const TableDiff = () => {
             pagination={{ 
               current: page,
               pageSize: MAX_PAGE_SIZE,
-              onChange: (page: number, pageSize: number) => setPage(page)
+              hideOnSinglePage: true,
+              showSizeChanger: false,
+              onChange: (page: number) => setPage(page)
             }}
             bordered
             // size="middle"
