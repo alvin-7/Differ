@@ -47,6 +47,11 @@ function getTableScroll({ extraHeight, ref }: {[key:string]: any}={}) {
 
 function setExcelData(diff: any, datas: any[], setColumns: React.Dispatch<React.SetStateAction<any[]>>, setData: React.Dispatch<React.SetStateAction<any[]>>, left=true) {
   const columns: {[key: string]: {[key:string]: any}} = {}
+  columns['Index'] = {
+    title: 'Index',
+    width: 80,
+    render: (text:string,record: object, index: number) => `${index+1}`
+  }
   const data = []
   for (let i=1; i<datas.length; i++) { 
     const itemD = datas[i]
