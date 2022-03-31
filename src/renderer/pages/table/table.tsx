@@ -125,15 +125,12 @@ const TableDiff = () => {
   }, [leftDatas, rightDatas])
 
   useEffect(() => {
-    console.log('ssssss', sheet)
     if (!sheet) return
     leftDatas[sheet]?.splice(0, 0, {})
     rightDatas[sheet]?.splice(0, 0, {})
     const leftD = leftDatas[sheet] || []
     const rightD = rightDatas[sheet] || []
-    console.log('sssssssssssssssssss', leftD, rightD)
     const diffData = window.electronAPI.diffArrays(leftD, rightD)
-    console.log('diffData', diffData)
     setDiff(diffData.diffObj)
     setExcelData(diffData.diffObj, diffData.leftData, setLeftColumns, setLeftData, true)
     setExcelData(diffData.diffObj, diffData.rightData, setRightColumns, setRightData, false)
@@ -158,7 +155,7 @@ const TableDiff = () => {
         <Table
           columns={leftColumns}
           dataSource={leftData}
-          pagination={false}
+          pagination={{pageSize: 100}}
           bordered
           // size="middle"
           // scroll={{ x: '100vw', y: '100vh' }}
@@ -175,7 +172,7 @@ const TableDiff = () => {
         <Table
           columns={rightColumns}
           dataSource={rightData}
-          pagination={false}
+          pagination={{pageSize: 100}}
           bordered
           // size="middle"
           // scroll={{ x: '100vw', y: '100vh' }}
