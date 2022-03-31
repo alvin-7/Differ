@@ -90,10 +90,10 @@ function itemRenderWrap(diff: diffType, rowKey: string, left = true) {
     if (!text) return text
     const key = record.key
     if (key in diff && diff[key] && rowKey in diff[key]) {
-      if (left) return <div className='row-item-left-highlight'>{text}</div>
-      else return <div className='row-item-right-highlight'>{text}</div>
+      if (left) return <div className='diff-row-left-item'>{text}</div>
+      else return <div className='diff-row-right-item'>{text}</div>
     }
-    return text
+    return <div className='row-item-common'>{text}</div>
   }
 }
 
@@ -101,15 +101,15 @@ function rowClassRenderWrap(diff: diffType, page: number, left=true) {
   return (record: any, index: number) => {
     index = (page - 1) * MAX_PAGE_SIZE + index + 1
     if (index in diff && JSON.stringify(diff[index]) !== '{}') {
-      return left ? 'row-left-highlight' : 'row-right-highlight'
+      return left ? 'diff-row-left' : 'diff-row-right'
     }
   }
 }
 
 // 绑定两个表格的滚动事件
 function bindTableScrollEvent() {
-  const leftTable = document.querySelector(".leftTable .ant-table-body")
-  const rightTable = document.querySelector(".rightTable .ant-table-body")
+  const leftTable = document.querySelector(".diff-left-table .ant-table-body")
+  const rightTable = document.querySelector(".diff-right-table .ant-table-body")
   let scrollLock = false
   leftTable.addEventListener('scroll', function () {
     if (scrollLock || (leftTable.scrollLeft === rightTable.scrollLeft && leftTable.scrollTop === rightTable.scrollTop)) {
@@ -193,7 +193,7 @@ const TableDiff = () => {
       <Row>
         <Col span={12}>
           <Table
-            className='leftTable'
+            className='diff-left-table'
             columns={leftColumns}
             dataSource={leftData}
             pagination={{ 
@@ -213,7 +213,7 @@ const TableDiff = () => {
         </Col>
         <Col span={12}>
           <Table
-            className='rightTable'
+            className='diff-right-table'
             columns={rightColumns}
             dataSource={rightData}
             pagination={{ 
