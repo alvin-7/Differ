@@ -15,7 +15,7 @@ import './styles.less'
 function getTableScroll({ extraHeight, ref }: {[key:string]: any}={}) {
   if (typeof extraHeight == "undefined") {
     //  默认底部分页64 + 边距10
-    extraHeight = 74 + 50
+    extraHeight = 74 + 50 + 60
   }
   let tHeader = null
   if (ref && ref.current) {
@@ -47,6 +47,11 @@ function getTableScroll({ extraHeight, ref }: {[key:string]: any}={}) {
 
 function setExcelData(diff: any, datas: any[], setColumns: React.Dispatch<React.SetStateAction<any[]>>, setData: React.Dispatch<React.SetStateAction<any[]>>, left=true) {
   const columns: {[key: string]: {[key:string]: any}} = {}
+  columns['Index'] = {
+    title: 'Index',
+    width: 80,
+    render: (text:string,record: object, index: number) => `${index+1}`
+  }
   const data = []
   for (let i=1; i<datas.length; i++) { 
     const itemD = datas[i]
@@ -146,15 +151,12 @@ const TableDiff = () => {
   }, [leftDatas, rightDatas])
 
   useEffect(() => {
-    console.log('ssssss', sheet)
     if (!sheet) return
     leftDatas[sheet]?.splice(0, 0, {})
     rightDatas[sheet]?.splice(0, 0, {})
     const leftD = leftDatas[sheet] || []
     const rightD = rightDatas[sheet] || []
-    console.log('sssssssssssssssssss', leftD, rightD)
     const diffData = window.electronAPI.diffArrays(leftD, rightD)
-    console.log('diffData', diffData)
     setDiff(diffData.diffObj)
     setExcelData(diffData.diffObj, diffData.leftData, setLeftColumns, setLeftData, true)
     setExcelData(diffData.diffObj, diffData.rightData, setRightColumns, setRightData, false)
@@ -180,7 +182,7 @@ const TableDiff = () => {
           className='leftTable'
           columns={leftColumns}
           dataSource={leftData}
-          pagination={false}
+          pagination={{pageSize: 100}}
           bordered
           // size="middle"
           // scroll={{ x: '100vw', y: '100vh' }}
@@ -198,7 +200,7 @@ const TableDiff = () => {
           className='rightTable'
           columns={rightColumns}
           dataSource={rightData}
-          pagination={false}
+          pagination={{pageSize: 100}}
           bordered
           // size="middle"
           // scroll={{ x: '100vw', y: '100vh' }}
