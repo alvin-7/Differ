@@ -22,7 +22,7 @@ function SheetToJson(workbookSheets) {
       if (!(row in rowsData)) rowsData[row] = {}
       rowsData[row][col] = sheetData[colKey].v + ''
     }
-    for (let i=0; i<rowsData.length; i++) {
+    for (let i = 0; i < rowsData.length; i++) {
       if (!rowsData[i]) rowsData[i] = {}
     }
     sheets[sheetName] = rowsData
@@ -31,7 +31,7 @@ function SheetToJson(workbookSheets) {
 }
 
 contextBridge.exposeInMainWorld('electronAPI', {
-  ipcRenderer: {...ipcRenderer, on: ipcRenderer.on.bind(ipcRenderer)},
+  ipcRenderer: { ...ipcRenderer, on: ipcRenderer.on.bind(ipcRenderer) },
   // readXlsx: (path) => {
   //   if (typeof path === 'string') {
   //     path = fs.readFileSync(path)
@@ -52,7 +52,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     const rightData = [...rightSrcData]
     const leftObj = {}
     const rightObj = {}
-    const itemFunc = function(obj) {
+    const itemFunc = function (obj) {
       return (v, idx) => {
         const str = JSON.stringify(v)
         if (!(str in obj)) obj[str] = {}
@@ -84,7 +84,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     const diffItems = []
     let leftLine = 0
     let rightLine = 0
-    for (let i=0; i<sampleDiff.length; i++) {
+    for (let i = 0; i < sampleDiff.length; i++) {
       const diffItem = sampleDiff[i]
       const lineNum = diffItem.count
       if (diffItem.removed) {       //表示左边被移除行
@@ -119,9 +119,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
         rightLine += lineNum
       }
     }
-    if (removeObj)
-        rightData.splice(rightLine, 0, ...Array(removeObj.count).fill(''))
-    
+    if (removeObj) {
+      rightData.splice(rightLine, 0, ...Array(removeObj.count).fill(''))
+      diffItems.push([removeObj, null])
+    }
+
     for (const item of diffItems) {
       Object.assign(diffObj, deepDiff(item[0], item[1]))
     }

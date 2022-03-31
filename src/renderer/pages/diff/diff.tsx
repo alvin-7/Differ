@@ -50,15 +50,15 @@ const ExcelDiff = () => {
   }
 
 
-  const SHEET_TYPE: {[key: string]: SHEET_ITEM_TYPE} = {
+  const SHEET_TYPE: { [key: string]: SHEET_ITEM_TYPE } = {
     SRC: {
-      name: 'file_src', 
-      sheetSetter: setLeftSheets, 
+      name: 'file_src',
+      sheetSetter: setLeftSheets,
       titleSetter: setLeftTitle
     },
     DIFF: {
-      name: 'file_diff', 
-      sheetSetter: setRightSheets, 
+      name: 'file_diff',
+      sheetSetter: setRightSheets,
       titleSetter: setRightTitle
     }
   }
@@ -69,7 +69,7 @@ const ExcelDiff = () => {
     for (const line of sheet?.data || []) {
       if (line.length > 0) {
         diffString += line[0] ? line[0] : '&*'
-        for (let i=1; i<line.length; i++) {
+        for (let i = 1; i < line.length; i++) {
           const s = line[i] ? line[i] : '&*'
           diffString += '~' + s
         }
@@ -103,7 +103,7 @@ const ExcelDiff = () => {
     refreshTable()
   }, [sheetIdx, leftSheets, rightSheets])
 
-  const getFilds = (idName: string) =>{
+  const getFilds = (idName: string) => {
     return () => {
       const filedom = document.getElementById(idName);
       filedom.click()
@@ -115,7 +115,7 @@ const ExcelDiff = () => {
       const fileData = event.target.files[0]
       const reader = new FileReader()
       reader.readAsArrayBuffer(fileData)
-      reader.onload = function() {
+      reader.onload = function () {
         // const excelSheet = window.electronAPI.readXlsx(this.result)
         // setSheet(excelSheet)
         // setTitle(fileData.name)
@@ -140,11 +140,11 @@ const ExcelDiff = () => {
       />
     )
   };
-  
+
   const indexChange = (e: any) => {
     setSheetIdx(e.target.value)
   }
-  const styles: ReactDiffViewerStylesOverride  ={
+  const styles: ReactDiffViewerStylesOverride = {
     diffContainer: {
       overflowX: 'auto',
       // overflowX: "auto",
@@ -153,12 +153,12 @@ const ExcelDiff = () => {
       // "& pre": { whiteSpace: "pre" },
     },
     diffRemoved: {
-        overflowX: 'auto',
-        maxWidth: 300,
+      overflowX: 'auto',
+      maxWidth: 300,
     },
     diffAdded: {
-        overflowX: 'auto',
-        maxWidth: 300,
+      overflowX: 'auto',
+      maxWidth: 300,
     },
   }
 
@@ -175,17 +175,17 @@ const ExcelDiff = () => {
       }
       <Row>
         <Col span={12}>
-          <input id={SHEET_TYPE.SRC.name} type='file' accept=".xls,.xlsx" style={{display:'none'}} onChange={fileInputChange(SHEET_TYPE.SRC.sheetSetter, SHEET_TYPE.SRC.titleSetter)}></input>
+          <input id={SHEET_TYPE.SRC.name} type='file' accept=".xls,.xlsx" style={{ display: 'none' }} onChange={fileInputChange(SHEET_TYPE.SRC.sheetSetter, SHEET_TYPE.SRC.titleSetter)}></input>
           <Button icon={<UploadOutlined />} onClick={getFilds(SHEET_TYPE.SRC.name)}>Click to Upload</Button>
         </Col>
         <Col span={12}>
-          <input id={SHEET_TYPE.DIFF.name} type='file' accept=".xls,.xlsx" style={{display:'none'}} onChange={fileInputChange(SHEET_TYPE.DIFF.sheetSetter, SHEET_TYPE.DIFF.titleSetter)}></input>
+          <input id={SHEET_TYPE.DIFF.name} type='file' accept=".xls,.xlsx" style={{ display: 'none' }} onChange={fileInputChange(SHEET_TYPE.DIFF.sheetSetter, SHEET_TYPE.DIFF.titleSetter)}></input>
           <Button icon={<UploadOutlined />} onClick={getFilds(SHEET_TYPE.DIFF.name)}>Click to Upload</Button>
         </Col>
       </Row>
       {
-        leftStr ? (<DiffComponent oldValue={leftStr} newValue={rightStr} splitView={true} leftTitle={leftTitle} rightTitle={rightTitle} 
-        renderContent={inputSyntax} showDiffOnly={true} styles={styles}/>) : null
+        leftStr ? (<DiffComponent oldValue={leftStr} newValue={rightStr} splitView={true} leftTitle={leftTitle} rightTitle={rightTitle}
+          renderContent={inputSyntax} showDiffOnly={true} styles={styles} />) : null
       }
     </React.Fragment>
   );

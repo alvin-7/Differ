@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Layout, Menu  } from 'antd';
+import { Layout, Menu } from 'antd';
 import TableDiff from './pages/table/table';
 
 import { useAppSelector, useAppDispatch } from './redux/hooks';
@@ -16,18 +16,18 @@ const App = () => {
   const dispatch = useAppDispatch()
 
   return (
-    <Layout style={{minHeight: '100vh'}}>
+    <Layout style={{ minHeight: '100vh' }}>
       <Header className="header">
         <div className="logo" />
         {
-          sheets.length ? 
-          <Menu theme="dark" mode="horizontal" defaultSelectedKeys={[sheet]} onClick={(info)=>{dispatch(setSheet(info.key))}}>
-            {
-              sheets.map((value) => {
-                return <Menu.Item key={value}>{value}</Menu.Item>
-              })
-            }
-          </Menu> : null
+          sheets.length ?
+            <Menu theme="dark" mode="horizontal" defaultSelectedKeys={[sheet]} onClick={(info) => { dispatch(setSheet(info.key)) }}>
+              {
+                sheets.map((value) => {
+                  return <Menu.Item key={value}>{value}</Menu.Item>
+                })
+              }
+            </Menu> : null
         }
       </Header>
       <Content>
