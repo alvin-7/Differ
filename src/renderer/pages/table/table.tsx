@@ -7,6 +7,8 @@ import { setSheet as redux_setSheet, setSheets as redux_setSheets } from '../../
 
 import './styles.less'
 
+type diffType = { [key: string]: object }
+
 /**
  * 获取第一个表格的可视化高度
  * @param {number} extraHeight 额外的高度(表格底部的内容高度 Number类型,默认为74) 
@@ -45,7 +47,7 @@ function getTableScroll({ extraHeight, ref }: { [key: string]: any } = {}) {
   return height
 }
 
-function setExcelData(diff: any, datas: any[], setColumns: React.Dispatch<React.SetStateAction<any[]>>, setData: React.Dispatch<React.SetStateAction<any[]>>, left = true) {
+function setExcelData(diff: diffType, datas: any[], setColumns: React.Dispatch<React.SetStateAction<any[]>>, setData: React.Dispatch<React.SetStateAction<any[]>>, left = true) {
   const columns: { [key: string]: { [key: string]: any } } = {}
   columns['Index'] = {
     title: 'Index',
@@ -81,15 +83,24 @@ function setExcelData(diff: any, datas: any[], setColumns: React.Dispatch<React.
   setData(data)
 }
 
-function itemRenderWrap(diff: any, rowKey: string, left = true) {
+function itemRenderWrap(diff: diffType, rowKey: string, left = true) {
   return (text: string, record: { [key: string]: string | number }, index: number) => {
     if (!text) return text
     const key = record.key
-    if (key in diff) {
+    if (key in diff && diff[key] && rowKey in diff[key]) {
       if (left) return <text className='row-item-left-highlight'>{text}</text>
       else return <text className='row-item-right-highlight'>{text}</text>
     }
     return text
+  }
+}
+
+function rowClassRenderWrap(diff: diffType, left=true) {
+  return (record: any, index: number) => {
+    index += 1
+    if (index in diff && diff[index] !== {}) {
+      return left ? 'row-left-highlight' : 'row-right-highlight'
+    }
   }
 }
 
@@ -133,7 +144,7 @@ const TableDiff = () => {
   const [leftDatas, setLeftDatas] = useState<{ [key: string]: any }>({})    // {sheet1: {sheetData}, sheet2: {sheetData}}
   const [rightDatas, setRightDatas] = useState<{ [key: string]: any }>({})
 
-  const [diff, setDiff] = useState<{ [key: string]: object }>({})
+  const [diff, setDiff] = useState<diffType>({})
   const [scrollY, setScrollY] = useState("")
 
 
@@ -188,11 +199,7 @@ const TableDiff = () => {
             // scroll={{ x: '100vw', y: '100vh' }}
             tableLayout="fixed"
             scroll={{ y: scrollY, x: '100vw' }}
-            rowClassName={(record, index) => {
-              index += 1
-              if (index in diff) return 'row-left-highlight'
-              return ''
-            }}
+            rowClassName={rowClassRenderWrap(diff, true)}
           ></Table>
         </Col>
         <Col span={12}>
@@ -207,10 +214,7 @@ const TableDiff = () => {
             // tableLayout="fixed"
             scroll={{ y: scrollY, x: '100vw' }}
             tableLayout='fixed'
-            rowClassName={(record, index) => {
-              index += 1
-              if (index in diff) return 'row-right-highlight'
-            }}
+            rowClassName={rowClassRenderWrap(diff, false)}
           ></Table>
         </Col>
       </Row> : null
