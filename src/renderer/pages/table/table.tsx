@@ -7,6 +7,8 @@ import { setSheet as redux_setSheet, setSheets as redux_setSheets } from '../../
 
 import './styles.less'
 
+const MAX_PAGE_SIZE = 100
+
 type diffType = { [key: string]: object }
 
 /**
@@ -95,10 +97,10 @@ function itemRenderWrap(diff: diffType, rowKey: string, left = true) {
   }
 }
 
-function rowClassRenderWrap(diff: diffType, left=true) {
+function rowClassRenderWrap(diff: diffType, page: number, left=true) {
   return (record: any, index: number) => {
-    index += 1
-    if (index in diff && diff[index] !== {}) {
+    index = (page - 1) * MAX_PAGE_SIZE + index + 1
+    if (index in diff && JSON.stringify(diff[index]) !== '{}') {
       return left ? 'row-left-highlight' : 'row-right-highlight'
     }
   }
@@ -147,6 +149,7 @@ const TableDiff = () => {
   const [diff, setDiff] = useState<diffType>({})
   const [scrollY, setScrollY] = useState("")
 
+  const [page, setPage] = useState(1) // 当前页数
 
   //页面加载完成后才能获取到对应的元素及其位置
   useEffect(() => {
@@ -193,13 +196,17 @@ const TableDiff = () => {
             className='leftTable'
             columns={leftColumns}
             dataSource={leftData}
-            pagination={{ pageSize: 100 }}
+            pagination={{ 
+              current: page,
+              pageSize: MAX_PAGE_SIZE,
+              onChange: (page: number, pageSize: number) => setPage(page)
+            }}
             bordered
             // size="middle"
             // scroll={{ x: '100vw', y: '100vh' }}
             tableLayout="fixed"
             scroll={{ y: scrollY, x: '100vw' }}
-            rowClassName={rowClassRenderWrap(diff, true)}
+            rowClassName={rowClassRenderWrap(diff, page, true)}
           ></Table>
         </Col>
         <Col span={12}>
@@ -207,14 +214,18 @@ const TableDiff = () => {
             className='rightTable'
             columns={rightColumns}
             dataSource={rightData}
-            pagination={{ pageSize: 100 }}
+            pagination={{ 
+              current: page,
+              pageSize: MAX_PAGE_SIZE,
+              onChange: (page: number, pageSize: number) => setPage(page)
+            }}
             bordered
             // size="middle"
             // scroll={{ x: '100vw', y: '100vh' }}
             // tableLayout="fixed"
             scroll={{ y: scrollY, x: '100vw' }}
             tableLayout='fixed'
-            rowClassName={rowClassRenderWrap(diff, false)}
+            rowClassName={rowClassRenderWrap(diff, page, false)}
           ></Table>
         </Col>
       </Row> : null
