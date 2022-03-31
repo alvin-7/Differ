@@ -88,6 +88,31 @@ function itemRenderWrap (diff: any, rowKey: string, left=true) {
   }
 }
 
+// 绑定两个表格的滚动事件
+function bindTableScrollEvent(){
+  let leftTable = document.querySelector(".leftTable .ant-table-body")
+  let rightTable = document.querySelector(".rightTable .ant-table-body")
+  let scrollLock = false
+  leftTable.addEventListener('scroll', function(){
+    if ((leftTable.scrollLeft == rightTable.scrollLeft && leftTable.scrollTop == rightTable.scrollTop) || scrollLock){
+      return
+    }
+    scrollLock = true
+    rightTable.scrollLeft = leftTable.scrollLeft
+    rightTable.scrollTop = leftTable.scrollTop
+    scrollLock = false
+  }, true)
+  rightTable.addEventListener('scroll', function(){
+    if ((leftTable.scrollLeft == rightTable.scrollLeft && leftTable.scrollTop == rightTable.scrollTop) || scrollLock){
+      return
+    }
+    scrollLock = true
+    leftTable.scrollLeft = rightTable.scrollLeft
+    leftTable.scrollTop = rightTable.scrollTop
+    scrollLock = false
+  }, true)
+}
+
 let first = true
 
 const TableDiff = () => {
@@ -110,6 +135,7 @@ const TableDiff = () => {
   //页面加载完成后才能获取到对应的元素及其位置
   useEffect(() => {
       setScrollY(getTableScroll())
+      bindTableScrollEvent()
   }, [])
 
   useEffect(() => {
@@ -151,6 +177,7 @@ const TableDiff = () => {
     <Row>
       <Col span={12}>
         <Table
+          className='leftTable'
           columns={leftColumns}
           dataSource={leftData}
           pagination={false}
@@ -168,6 +195,7 @@ const TableDiff = () => {
       </Col>
       <Col span={12}>
         <Table
+          className='rightTable'
           columns={rightColumns}
           dataSource={rightData}
           pagination={false}
