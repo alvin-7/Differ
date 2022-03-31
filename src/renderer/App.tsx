@@ -1,27 +1,34 @@
 import * as React from 'react';
 import { Layout, Menu  } from 'antd';
-// import CodeDiffer from './pages/diff/diff';
 import TableDiff from './pages/table/table';
 
 import { useAppSelector, useAppDispatch } from './redux/hooks';
 import type { RootState } from './redux/store';
-import { setterLayout } from './redux/setter/layoutSetter'
+import { setSheet } from './redux/setter/layoutSetter'
 
 const { Header, Content, Footer } = Layout;
 
 import './App.less';
 
 const App = () => {
+  const sheets = useAppSelector((state: RootState) => state.setter.sheets)
+  const sheet = useAppSelector((state: RootState) => state.setter.sheet)
+  const dispatch = useAppDispatch()
 
   return (
     <Layout style={{minHeight: '100vh'}}>
       <Header className="header">
         <div className="logo" />
-        <Menu theme="dark" mode="horizontal" defaultSelectedKeys={['2']}>
-          <Menu.Item key="1">nav 1</Menu.Item>
-          <Menu.Item key="2">nav 2</Menu.Item>
-          <Menu.Item key="3">nav 3</Menu.Item>
-        </Menu>
+        {
+          sheets.length ? 
+          <Menu theme="dark" mode="horizontal" defaultSelectedKeys={[sheet]} onClick={(info)=>{dispatch(setSheet(info.key))}}>
+            {
+              sheets.map((value) => {
+                return <Menu.Item key={value}>{value}</Menu.Item>
+              })
+            }
+          </Menu> : null
+        }
       </Header>
       <Content>
         <Layout className="site-layout-background" style={{ padding: '24px 0' }}>

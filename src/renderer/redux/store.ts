@@ -1,9 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit'
 import counterSliceReducer from './counter/counterSlice'
+import setterReducer from './setter/layoutSetter'
 
 const store = configureStore({
   reducer: {
-    counter: counterSliceReducer
+    counter: counterSliceReducer,
+    setter: setterReducer
   },
 })
 

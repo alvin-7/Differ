@@ -1,6 +1,10 @@
-// import React, { Dispatch, SetStateAction, useEffect, useState, useRef, useLayoutEffect } from "react";
 import { Row, Col, Table } from 'antd';
 import React, { useState, useEffect } from 'react';
+//redux
+import { useAppSelector, useAppDispatch } from '../../redux/hooks';
+import { RootState } from '../../redux/store';
+import { setSheet as redux_setSheet, setSheets as redux_setSheets } from '../../redux/setter/layoutSetter';
+
 import './styles.less'
 
 /**
@@ -56,7 +60,6 @@ function setExcelData(diff: any, datas: any[], setColumns: React.Dispatch<React.
         columns[k].width = Math.max(+columns[k].width, width)
         continue
       }
-      console.log('ccccck', k)
       columns[k] = {
         title: k,
         dataIndex: k,
@@ -77,7 +80,7 @@ function itemRenderWrap (diff: any, rowKey: string, left=true) {
   return (text:string, record: {[key:string]: string|number}, index: number) => {
     if (!text) return text
     const key = record.key
-    if (key in diff && rowKey in diff[key]) {
+    if (key in diff && diff[key] && diff[key][rowKey]) {
       if (left) return <text className='row-item-left-highlight'>{text}</text>
       else return <text className='row-item-right-highlight'>{text}</text>
     }
@@ -88,62 +91,63 @@ function itemRenderWrap (diff: any, rowKey: string, left=true) {
 let first = true
 
 const TableDiff = () => {
-  // const listHeight = useRef<HTMLDivElement>(null)
+  //redux
+  const sheet = useAppSelector((state: RootState) => state.setter.sheet)
+  const dispatch = useAppDispatch()
+
   const [leftColumns, setLeftColumns] = useState([])
   const [leftData, setLeftData] = useState([])
   const [rightColumns, setRightColumns] = useState([])
   const [rightData, setRightData] = useState([])
+
+  const [leftDatas, setLeftDatas] = useState<{[key:string]: any}>({})    // {sheet1: {sheetData}, sheet2: {sheetData}}
+  const [rightDatas, setRightDatas] = useState<{[key:string]: any}>({})
+
   const [diff, setDiff] = useState<{[key:string]: object}>({})
   const [scrollY, setScrollY] = useState("")
-    //页面加载完成后才能获取到对应的元素及其位置
+
+
+  //页面加载完成后才能获取到对应的元素及其位置
   useEffect(() => {
       setScrollY(getTableScroll())
   }, [])
 
-  // const getWindowSize = () => ({
-  //   innerHeight: window.innerHeight,
-  //   innerWidth: window.innerWidth,
-  // });
-  // const [windowSize, setWindowSize] = useState(getWindowSize());
+  useEffect(() => {
+    const sheetItems = new Set([...Object.keys(leftDatas), ...Object.keys(rightDatas)])
+    dispatch(redux_setSheets(Array.from(sheetItems)))
+    const sheet_item = sheetItems.values().next().value
+    dispatch(redux_setSheet(sheet_item))
+  }, [leftDatas, rightDatas])
 
-  // useLayoutEffect(() => {
-  //   console.log('listHeight', listHeight?.current?.clientHeight)
-  // })
-  // useEffect(()=> {
-  //   window.addEventListener('rezise', () => {
-  //     console.log('111listHeight', listHeight?.current?.clientHeight)
-  //   })
-  // }, [windowSize])
-
+  useEffect(() => {
+    console.log('ssssss', sheet)
+    if (!sheet) return
+    leftDatas[sheet]?.splice(0, 0, {})
+    rightDatas[sheet]?.splice(0, 0, {})
+    const leftD = leftDatas[sheet] || []
+    const rightD = rightDatas[sheet] || []
+    console.log('sssssssssssssssssss', leftD, rightD)
+    const diffData = window.electronAPI.diffArrays(leftD, rightD)
+    console.log('diffData', diffData)
+    setDiff(diffData.diffObj)
+    setExcelData(diffData.diffObj, diffData.leftData, setLeftColumns, setLeftData, true)
+    setExcelData(diffData.diffObj, diffData.rightData, setRightColumns, setRightData, false)
+  }, [sheet, leftDatas, rightDatas])
 
   if (first) {
     first = false 
     const ipc = window.electronAPI.ipcRenderer
-    // ipc.on('resized', (e, msg) => {
-    //   console.log('resized', e, msg)
-    //   console.log(listHeight, listHeight?.current?.clientHeight)
-    // })
     ipc.invoke('ipc_excel_paths').then((excelPaths: string[]) => {
-      console.log(excelPaths)
       if (excelPaths.length) {
-        // console.log('render', excelPaths)
-        const datas = window.electronAPI.readXlsx(excelPaths[0])
+        const leftDatas = window.electronAPI.readXlsx(excelPaths[0])
         const rightDatas = window.electronAPI.readXlsx(excelPaths[1])
-
-        // const data = []
-        const defaultSheet = Object.keys(datas)[0]
-
-        datas[defaultSheet].splice(0, 0, {})
-        rightDatas[defaultSheet].splice(0, 0, {})
-        const diffData = window.electronAPI.diffArrays(datas[defaultSheet], rightDatas[defaultSheet])
-        setExcelData(diffData.diffObj, diffData.leftData, setLeftColumns, setLeftData, true)
-        setExcelData(diffData.diffObj, diffData.rightData, setRightColumns, setRightData, false)
-        setDiff(diffData.diffObj)
+        setLeftDatas(leftDatas)
+        setRightDatas(rightDatas)
       }
     })
   }
   return (
-    leftColumns && leftData ?
+    leftColumns && leftData && rightData ?
     <Row>
       <Col span={12}>
         <Table
@@ -157,7 +161,8 @@ const TableDiff = () => {
           scroll={{ y: scrollY, x: '100vw' }}
           rowClassName={(record, index)=> {
             index += 1
-            if (index in diff && Object.keys(diff[index]).length) return 'row-left-highlight'
+            if (index in diff && Object.keys(diff[index]||{}).length) return 'row-left-highlight'
+            return ''
           }}
         ></Table>
       </Col>
@@ -174,7 +179,7 @@ const TableDiff = () => {
           tableLayout='fixed'
           rowClassName={(record, index)=> {
             index += 1
-            if (index in diff && Object.keys(diff[index]).length) return 'row-right-highlight'
+            if (index in diff && Object.keys(diff[index]||{}).length) return 'row-right-highlight'
           }}
         ></Table>
       </Col>
