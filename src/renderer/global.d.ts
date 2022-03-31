@@ -22,7 +22,11 @@ export interface IElectronAPI {
    *         "C": "1"   [update or add]
    *     }
    */
-  diffArrays: (leftData: any[], rightData: any[]) => {[key: string]: {[key: string]: string|undefined}}
+  diffArrays: (leftData: any[], rightData: any[]) => {
+    leftData: any[],
+    rightData: any[],
+    diffObj: {[key: string]: {[key: string]: string|undefined}},
+  }
 }
 
 declare global {

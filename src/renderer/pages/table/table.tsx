@@ -1,114 +1,7 @@
 // import React, { Dispatch, SetStateAction, useEffect, useState, useRef, useLayoutEffect } from "react";
 import { Row, Col, Table } from 'antd';
-import React, { useState, useEffect, useRef } from 'react';
-import { VariableSizeGrid as Grid } from 'react-window';
-import ResizeObserver from 'rc-resize-observer';
-import classNames from 'classnames';
-
-function VirtualTable(props: Parameters<typeof Table>[0]) {
-  const { columns, scroll } = props;
-  const [tableWidth, setTableWidth] = useState(0);
-
-  const widthColumnCount = columns!.filter(({ width }) => !width).length;
-  const mergedColumns = columns!.map(column => {
-    if (column.width) {
-      return column;
-    }
-
-    return {
-      ...column,
-      width: Math.floor(tableWidth / widthColumnCount),
-    };
-  });
-
-  const gridRef = useRef<any>();
-  const [connectObject] = useState<any>(() => {
-    const obj = {};
-    Object.defineProperty(obj, 'scrollLeft', {
-      get: () => null,
-      set: (scrollLeft: number) => {
-        if (gridRef.current) {
-          gridRef.current.scrollTo({ scrollLeft });
-        }
-      },
-    });
-
-    return obj;
-  });
-
-  const resetVirtualGrid = () => {
-    gridRef.current.resetAfterIndices({
-      columnIndex: 0,
-      shouldForceUpdate: true,
-    });
-  };
-
-  useEffect(() => resetVirtualGrid, [tableWidth]);
-
-  const renderVirtualList = (rawData: object[], { scrollbarSize, ref, onScroll }: any) => {
-    ref.current = connectObject;
-    const totalHeight = rawData.length * 54;
-
-    return (
-      <Grid
-        ref={gridRef}
-        className="virtual-grid"
-        columnCount={mergedColumns.length}
-        columnWidth={(index: number) => {
-          const { width } = mergedColumns[index];
-          return totalHeight > scroll.y && index === mergedColumns.length - 1
-            ? (width as number) - scrollbarSize - 1
-            : (width as number);
-        }}
-        height={+scroll?.y||1000}
-        rowCount={rawData.length}
-        rowHeight={() => 54}
-        width={tableWidth}
-        onScroll={({ scrollLeft }: { scrollLeft: number }) => {
-          onScroll({ scrollLeft });
-        }}
-      >
-        {({
-          columnIndex,
-          rowIndex,
-          style,
-        }: {
-          columnIndex: number;
-          rowIndex: number;
-          style: React.CSSProperties;
-        }) => (
-          <div
-            className={classNames('virtual-table-cell', {
-              'virtual-table-cell-last': columnIndex === mergedColumns.length - 1,
-            })}
-            style={style}
-          >
-            {(rawData[rowIndex] as any)[(mergedColumns as any)[columnIndex].dataIndex]}
-          </div>
-        )}
-      </Grid>
-    );
-  };
-
-  return (
-    <ResizeObserver
-      onResize={({ width }) => {
-        setTableWidth(width);
-      }}
-    >
-      <Table
-        {...props}
-        className="virtual-table"
-        columns={mergedColumns}
-        pagination={false}
-        components={{
-          body: renderVirtualList,
-        }}
-      />
-    </ResizeObserver>
-  );
-}
-
+import React, { useState, useEffect } from 'react';
+import './styles.less'
 
 /**
  * 获取第一个表格的可视化高度
@@ -118,7 +11,7 @@ function VirtualTable(props: Parameters<typeof Table>[0]) {
 function getTableScroll({ extraHeight, ref }: {[key:string]: any}={}) {
   if (typeof extraHeight == "undefined") {
     //  默认底部分页64 + 边距10
-    extraHeight = 74
+    extraHeight = 74 + 50
   }
   let tHeader = null
   if (ref && ref.current) {
@@ -131,6 +24,7 @@ function getTableScroll({ extraHeight, ref }: {[key:string]: any}={}) {
   if (tHeader) {
     tHeaderBottom = tHeader.getBoundingClientRect().bottom
   }
+
   // 窗体高度-表格内容顶部的高度-表格内容底部的高度
   // let height = document.body.clientHeight - tHeaderBottom - extraHeight
   const height = `calc(100vh - ${tHeaderBottom + extraHeight}px)`
@@ -147,13 +41,59 @@ function getTableScroll({ extraHeight, ref }: {[key:string]: any}={}) {
   return height
 }
 
+function setExcelData(diff: any, datas: any[], setColumns: React.Dispatch<React.SetStateAction<any[]>>, setData: React.Dispatch<React.SetStateAction<any[]>>, left=true) {
+  const columns: {[key: string]: {[key:string]: any}} = {}
+  const data = []
+  for (let i=1; i<datas.length; i++) { 
+    const itemD = datas[i]
+    const keys = Object.keys(itemD)
+    const dItem: {[key:string]: string|number} = {}
+    for (const k of keys) {
+      const cArr = itemD[k].match(/[^x00-xff]/ig);
+      const width = ((itemD[k]+'').length + (cArr ? cArr.length : 0)) * 10
+      dItem[k] = itemD[k]
+      if (k in columns) {
+        columns[k].width = Math.max(+columns[k].width, width)
+        continue
+      }
+      console.log('ccccck', k)
+      columns[k] = {
+        title: k,
+        dataIndex: k,
+        width: width,
+        render: itemRenderWrap(diff, k, left)
+        // key: k,
+        // fixed: 'left'
+      }
+    }
+    dItem.key = i
+    data.push(dItem)
+  }
+  setColumns(Object.values(columns))
+  setData(data)
+}
+
+function itemRenderWrap (diff: any, rowKey: string, left=true) {
+  return (text:string, record: {[key:string]: string|number}, index: number) => {
+    if (!text) return text
+    const key = record.key
+    if (key in diff && rowKey in diff[key]) {
+      if (left) return <text className='row-item-left-highlight'>{text}</text>
+      else return <text className='row-item-right-highlight'>{text}</text>
+    }
+    return text
+  }
+}
+
 let first = true
 
 const TableDiff = () => {
   // const listHeight = useRef<HTMLDivElement>(null)
-  const [columns, setColumns] = useState([])
-  const [data, setData] = useState([])
-  const [diff, setDiff] = useState({})
+  const [leftColumns, setLeftColumns] = useState([])
+  const [leftData, setLeftData] = useState([])
+  const [rightColumns, setRightColumns] = useState([])
+  const [rightData, setRightData] = useState([])
+  const [diff, setDiff] = useState<{[key:string]: object}>({})
   const [scrollY, setScrollY] = useState("")
     //页面加载完成后才能获取到对应的元素及其位置
   useEffect(() => {
@@ -186,80 +126,57 @@ const TableDiff = () => {
     ipc.invoke('ipc_excel_paths').then((excelPaths: string[]) => {
       console.log(excelPaths)
       if (excelPaths.length) {
-        console.log('render', excelPaths)
+        // console.log('render', excelPaths)
         const datas = window.electronAPI.readXlsx(excelPaths[0])
         const rightDatas = window.electronAPI.readXlsx(excelPaths[1])
 
-        console.log('datas', datas, rightDatas)
-        const columns: {[key: string]: {[key:string]: string|number}} = {}
-        const data = []
-        const sheetNames = Object.keys(datas)
+        // const data = []
+        const defaultSheet = Object.keys(datas)[0]
 
-        console.log('orgin data', datas[sheetNames[0]], rightDatas[sheetNames[0]])
-        const diffData = window.electronAPI.diffArrays(datas[sheetNames[0]], rightDatas[sheetNames[0]])
-        console.log('diffData', diffData  )
-        diffData && setDiff(diffData)
-
-        for (let i=1; i<datas[sheetNames[0]].length; i++) { 
-          const itemD = datas[sheetNames[0]][i]
-          const keys = Object.keys(itemD)
-          const dItem: {[key:string]: string|number} = {}
-          for (const k of keys) {
-            const cArr = itemD[k].match(/[^x00-xff]/ig);
-            const width = ((itemD[k]+'').length + (cArr ? cArr.length : 0)) * 10
-            dItem[k] = itemD[k]
-            if (k in columns) {
-              columns[k].width = Math.max(+columns[k].width, width)
-              continue
-            }
-            columns[k] = {
-              title: k,
-              dataIndex: k,
-              width: width,
-              // key: k,
-              // fixed: 'left'
-            }
-          }
-          dItem.key = i
-          data.push(dItem)
-        }
-        console.log('exceljs sheet', datas)
-        console.log('columns', columns)
-        console.log('data', data)
-        setColumns(Object.values(columns))
-        setData(data)
+        datas[defaultSheet].splice(0, 0, {})
+        rightDatas[defaultSheet].splice(0, 0, {})
+        const diffData = window.electronAPI.diffArrays(datas[defaultSheet], rightDatas[defaultSheet])
+        setExcelData(diffData.diffObj, diffData.leftData, setLeftColumns, setLeftData, true)
+        setExcelData(diffData.diffObj, diffData.rightData, setRightColumns, setRightData, false)
+        setDiff(diffData.diffObj)
       }
     })
   }
   return (
-    columns && data ?
+    leftColumns && leftData ?
     <Row>
       <Col span={12}>
-        <VirtualTable
-          columns={columns}
-          dataSource={data}
-          // bordered
+        <Table
+          columns={leftColumns}
+          dataSource={leftData}
+          pagination={false}
+          bordered
           // size="middle"
           // scroll={{ x: '100vw', y: '100vh' }}
           tableLayout="fixed"
           scroll={{ y: scrollY, x: '100vw' }}
-        ></VirtualTable>
+          rowClassName={(record, index)=> {
+            index += 1
+            if (index in diff && Object.keys(diff[index]).length) return 'row-left-highlight'
+          }}
+        ></Table>
       </Col>
       <Col span={12}>
-        <VirtualTable
-          columns={columns}
-          dataSource={data}
-          // bordered
+        <Table
+          columns={rightColumns}
+          dataSource={rightData}
+          pagination={false}
+          bordered
           // size="middle"
           // scroll={{ x: '100vw', y: '100vh' }}
           // tableLayout="fixed"
-          scroll={{ y: 1000, x: 500 }}
-          tableLayout='auto'
-          rowClassName={(record, index) => {
-            console.log(index)
-            return index%2 === 0 ? "active": ''
+          scroll={{ y: scrollY, x: '100vw' }}
+          tableLayout='fixed'
+          rowClassName={(record, index)=> {
+            index += 1
+            if (index in diff && Object.keys(diff[index]).length) return 'row-right-highlight'
           }}
-        ></VirtualTable>
+        ></Table>
       </Col>
     </Row> : null
   );

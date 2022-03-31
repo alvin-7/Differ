@@ -68,7 +68,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
           const idx = srcObj.indexOf(o[i])
           ob[idx] = o[i]
         }
-        console.log(1111111, ob)
         Object.assign(pre, ob)
         return pre
       }
@@ -95,24 +94,24 @@ contextBridge.exposeInMainWorld('electronAPI', {
         rightLine += lineNum
         const addObj = diffItem
         if (removeObj) {            //表示移除左边，并添加右边
-          const addLen = removeObj.value.length - addObj.value.length
+          const addLen = removeObj.value.length - lineNum
           // const start = removeObj.value.length ? removeObj.value[0]
           if (addLen > 0) {
-            rightData.splice(rightLine-1, 0, ...Array(addLen).fill('add'))
+            rightData.splice(rightLine, 0, ...Array(addLen).fill(''))
           } else if (addLen < 0) {
-            leftData.splice(leftLine-1, 0, ...Array(-addLen).fill('add'))
+            leftData.splice(leftLine, 0, ...Array(-addLen).fill(''))
           }
           diffItems.push([removeObj, addObj])
+          removeObj = null
         } else {                    //仅仅是右边添加，没有移除左边
-          leftData.splice(leftLine-1, 0, ...Array(addObj.value.length).fill('add'))
+          leftData.splice(leftLine, 0, ...Array(lineNum).fill(''))
           diffItems.push([null, addObj])
         }
-        removeObj = null
       } else if (removeObj) {       //表示左边被移除，但是没有添加   也就是右边需要添加几个空行
         leftLine += lineNum
         rightLine += lineNum
 
-        rightData.splice(rightLine-1, 0, ...Array(removeObj.value.length).fill('add'))
+        rightData.splice(rightLine, 0, ...Array(lineNum).fill(''))
         diffItems.push([removeObj, null])
         removeObj = null
       } else {
@@ -120,6 +119,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
         rightLine += lineNum
       }
     }
+    if (removeObj)
+        rightData.splice(rightLine, 0, ...Array(removeObj.count).fill(''))
     
     for (const item of diffItems) {
       Object.assign(diffObj, deepDiff(item[0], item[1]))

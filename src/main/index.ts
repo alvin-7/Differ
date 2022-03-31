@@ -30,6 +30,8 @@ const createWindow = (): void => {
 
   // Open the DevTools.
   isDev && mainWindow.webContents.openDevTools();
+  // mainWindow.webContents.openDevTools();
+
 
   mainWindow.on('resize', () => {
     // const sizeData = mainWindow.getContentSize()
