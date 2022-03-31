@@ -15,7 +15,7 @@ import './styles.less'
 function getTableScroll({ extraHeight, ref }: {[key:string]: any}={}) {
   if (typeof extraHeight == "undefined") {
     //  默认底部分页64 + 边距10
-    extraHeight = 74 + 50
+    extraHeight = 74 + 50 + 60
   }
   let tHeader = null
   if (ref && ref.current) {
