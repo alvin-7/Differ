@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 //redux
 import { useAppSelector, useAppDispatch } from '../../redux/hooks';
 import { RootState } from '../../redux/store';
-import { setSheet as redux_setSheet, setSheets as redux_setSheets, setDiffLen as redux_setDiffLen } from '../../redux/setter/layoutSetter';
+import { setSheet as redux_setSheet, setSheets as redux_setSheets, setDiffLen as redux_setDiffLen, setDiffIdx as redux_setDiffIdx } from '../../redux/setter/layoutSetter';
 import scrollIntoView from "scroll-into-view";
 
 import './styles.less'
@@ -188,6 +188,7 @@ const TableDiff = () => {
     const diffData = window.electronAPI.diffArrays(leftD, rightD)
     setDiff(diffData.diffObj)
     dispatch(redux_setDiffLen(Object.keys(diffData.diffObj).length))
+    dispatch(redux_setDiffIdx(0))
     setExcelData(diffData.diffObj, diffData.leftData, setLeftColumns, setLeftData, true)
     setExcelData(diffData.diffObj, diffData.rightData, setRightColumns, setRightData, false)
   }, [redux_sheet, leftDatas, rightDatas])
