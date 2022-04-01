@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 //redux
 import { useAppSelector, useAppDispatch } from '../../redux/hooks';
 import { RootState } from '../../redux/store';
-import { setSheet as redux_setSheet, setSheets as redux_setSheets, setDiffLen as redux_setDiffLen, setDiffIdx as redux_setDiffIdx } from '../../redux/setter/layoutSetter';
+import { setSheet as redux_setSheet, setSheets as redux_setSheets, setDiffKeys as redux_setDiffKeys, setDiffIdx as redux_setDiffIdx, setDiffIdx } from '../../redux/setter/layoutSetter';
 import scrollIntoView from "scroll-into-view";
 
 import './styles.less'
@@ -149,9 +149,10 @@ let diffScroll = 0
 
 const TableDiff = () => {
   //redux
+  const dispatch = useAppDispatch()
   const redux_sheet = useAppSelector((state: RootState) => state.setter.sheet)
   const redux_diffIdx = useAppSelector((state: RootState) => state.setter.diffIdx)
-  const dispatch = useAppDispatch()
+  const redux_diffKeys = useAppSelector((state: RootState) => state.setter.diffKeys)
 
   const [leftColumns, setLeftColumns] = useState([])
   const [leftData, setLeftData] = useState([])
@@ -190,29 +191,31 @@ const TableDiff = () => {
     const rightD = rightDatas[redux_sheet] || []
     const diffData = window.electronAPI.diffArrays(leftD, rightD)
     setDiff(diffData.diffObj)
-    dispatch(redux_setDiffLen(Object.keys(diffData.diffObj).length))
+    const lineKeys = Object.keys(diffData.diffObj).map(v=>+v)
+    dispatch(redux_setDiffKeys(lineKeys))
     dispatch(redux_setDiffIdx(-1))
     setExcelData(diffData.diffObj, diffData.leftData, setLeftColumns, setLeftData, true)
     setExcelData(diffData.diffObj, diffData.rightData, setRightColumns, setRightData, false)
   }, [redux_sheet, leftDatas, rightDatas])
 
   useEffect(() => {
-    const diffIdxs = Object.keys(diff).map(v=>+v).sort(()=>1)
-    const index = diffIdxs[redux_diffIdx]
-    if (index === 0) return
-    const page_diff = Math.ceil(index / MAX_PAGE_SIZE)
+    if (redux_diffKeys.indexOf(redux_diffIdx) === -1) return
+    const page_diff = Math.ceil(redux_diffIdx / MAX_PAGE_SIZE)
     if (page_diff > 0 && page_diff !== page) {
+      diffScroll = redux_diffIdx
       setPage(page_diff)
-      diffScroll = index
     } else {
-      handleScroll(index)
+      handleScroll(redux_diffIdx)
     }
   }, [redux_diffIdx])
 
   useEffect(() => {
     if (diffScroll !== 0) {
       setTimeout(() => handleScroll(diffScroll), 100)
-    }
+    } else if (redux_diffIdx >= 0) {  // it set
+      const curLine = (page-1) * MAX_PAGE_SIZE
+      dispatch(redux_setDiffIdx(curLine))
+    }  
   }, [page])
 
   if (first) {

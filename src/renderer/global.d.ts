@@ -25,7 +25,7 @@ export interface IElectronAPI {
   diffArrays: (leftData: any[], rightData: any[]) => {
     leftData: any[],
     rightData: any[],
-    diffObj: {[key: string]: {[key: string]: string|undefined}},
+    diffObj: {[key: number]: {[key: string]: string|undefined}},
   }
 }
 

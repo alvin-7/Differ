@@ -6,7 +6,7 @@ interface SetterState {
   sheets: string[]
   sheet: string,
   diffIdx: number,
-  diffLen: number
+  diffKeys: number[]
 }
 
 // Define the initial state using that type
@@ -14,7 +14,7 @@ const initialState: SetterState = {
   sheets: [],
   sheet: '',
   diffIdx: -1,
-  diffLen: 0
+  diffKeys: []
 }
 
 export const layoutSetter = createSlice({
@@ -31,18 +31,18 @@ export const layoutSetter = createSlice({
     setDiffIdx: (state, action: PayloadAction<number>) => {
       state.diffIdx = action.payload
     },
-    setDiffLen: (state, action: PayloadAction<number>) => {
-      state.diffLen = action.payload
+    setDiffKeys: (state, action: PayloadAction<number[]>) => {
+      state.diffKeys = action.payload
     }
   },
 })
 
-export const { setSheets, setSheet, setDiffIdx, setDiffLen } = layoutSetter.actions
+export const { setSheets, setSheet, setDiffIdx, setDiffKeys } = layoutSetter.actions
 
 // Other code such as selectors can use the imported `RootState` type
 export const selectSheets = (state: RootState) => state.setter.sheets
 export const selectSheet = (state: RootState) => state.setter.sheet
 export const selectDiffIdx = (state: RootState) => state.setter.diffIdx
-export const selectDiffLen = (state: RootState) => state.setter.diffLen
+export const selectDiffKeys = (state: RootState) => state.setter.diffKeys
 
 export default layoutSetter.reducer

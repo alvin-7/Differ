@@ -4,7 +4,7 @@ import TableDiff from './pages/table/table';
 
 import { useAppSelector, useAppDispatch } from './redux/hooks';
 import type { RootState } from './redux/store';
-import { setSheet as redux_setSheet, setDiffIdx as redux_setDiffIdx, setDiffIdx } from './redux/setter/layoutSetter'
+import { setSheet as redux_setSheet, setDiffIdx as redux_setDiffIdx } from './redux/setter/layoutSetter'
 
 const { Header, Content, Footer } = Layout;
 
@@ -14,15 +14,26 @@ const App = () => {
   const redux_sheets = useAppSelector((state: RootState) => state.setter.sheets)
   const redux_sheet = useAppSelector((state: RootState) => state.setter.sheet)
   const redux_diffIdx = useAppSelector((state: RootState) => state.setter.diffIdx)
-  const redux_diffLen = useAppSelector((state: RootState) => state.setter.diffLen)
+  const redux_diffKeys = useAppSelector((state: RootState) => state.setter.diffKeys)
   const dispatch = useAppDispatch()
 
   const onClickDiffScroll = function(pre=true) {
     return () => {
-      const idx = pre ? redux_diffIdx - 1 : redux_diffIdx + 1
-      if (idx < -1)  return
-      if (idx > redux_diffLen)  return
-      dispatch(setDiffIdx(idx))
+      const lineIdx = redux_diffKeys.indexOf(redux_diffIdx) 
+      let line = -1
+      for (const l of redux_diffKeys) {
+        if (pre) {
+          if (l < redux_diffIdx) line = l
+          else break
+        } else {
+          if (l > redux_diffIdx) {
+            line = l
+            break
+          }
+        }
+      }
+      // const line = (pre ? redux_diffKeys[lineIdx-1] : redux_diffKeys[lineIdx+1]) || -1
+      if (line !== -1) dispatch(redux_setDiffIdx(line))
     }
   }
 
