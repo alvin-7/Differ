@@ -211,7 +211,7 @@ const TableDiff = () => {
 
   useEffect(() => {
     if (diffScroll !== 0) {
-      setTimeout(() => handleScroll(diffScroll), 100)
+      handleScroll(diffScroll)
     } else if (redux_diffIdx >= 0) {  // it set
       const curLine = (page-1) * MAX_PAGE_SIZE
       dispatch(redux_setDiffIdx(curLine))
