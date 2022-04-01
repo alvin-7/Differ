@@ -20,7 +20,7 @@ type diffType = { [key: string]: object }
 function getTableScroll({ extraHeight, ref }: { [key: string]: any } = {}) {
   if (typeof extraHeight == "undefined") {
     //  默认底部分页64 + 边距10
-    extraHeight = 74 + 50 + 60
+    extraHeight = 74 + 70
   }
   let tHeader = null
   if (ref && ref.current) {
@@ -63,17 +63,17 @@ function setExcelData(diff: diffType, datas: any[], setColumns: React.Dispatch<R
     const keys = Object.keys(itemD)
     const dItem: { [key: string]: string | number } = {}
     for (const k of keys) {
-      const cArr = itemD[k].match(/[^x00-xff]/ig);
-      const width = ((itemD[k] + '').length + (cArr ? cArr.length : 0)) * 10
+      // const cArr = itemD[k].match(/[^x00-xff]/ig);
+      // const width = ((itemD[k] + '').length + (cArr ? cArr.length : 0)) * 3
       dItem[k] = itemD[k]
       if (k in columns) {
-        columns[k].width = Math.max(+columns[k].width, width)
+        // columns[k].width = Math.min(Math.max(+columns[k].width, width), 300)
         continue
       }
       columns[k] = {
         title: k,
         dataIndex: k,
-        width: width,
+        // width: width,  // 默认就行
         render: itemRenderWrap(diff, k, left)
         // key: k,
         // fixed: 'left'
@@ -164,6 +164,9 @@ const TableDiff = () => {
   const [diff, setDiff] = useState<diffType>({})
   const [scrollY, setScrollY] = useState("")
 
+  const [leftTitle, setLeftTitle] = useState('')
+  const [rightTitle, setRightTitle] = useState('')
+
   const [page, setPage] = useState(1) // 当前页数
 
   //页面加载完成后才能获取到对应的元素及其位置
@@ -219,6 +222,8 @@ const TableDiff = () => {
       if (excelPaths.length) {
         const leftDatas = window.electronAPI.readXlsx(excelPaths[0])
         const rightDatas = window.electronAPI.readXlsx(excelPaths[1])
+        setLeftTitle(excelPaths[0])
+        setRightTitle(excelPaths[1])
         setLeftDatas(leftDatas)
         setRightDatas(rightDatas)
       }
@@ -232,6 +237,7 @@ const TableDiff = () => {
             className='diff-left-table'
             columns={leftColumns}
             dataSource={leftData}
+            title={()=>leftTitle}
             pagination={{ 
               current: page,
               pageSize: MAX_PAGE_SIZE,
@@ -252,6 +258,7 @@ const TableDiff = () => {
             className='diff-right-table'
             columns={rightColumns}
             dataSource={rightData}
+            title={()=>rightTitle}
             pagination={{ 
               current: page,
               pageSize: MAX_PAGE_SIZE,
