@@ -188,12 +188,13 @@ const TableDiff = () => {
     const diffData = window.electronAPI.diffArrays(leftD, rightD)
     setDiff(diffData.diffObj)
     dispatch(redux_setDiffLen(Object.keys(diffData.diffObj).length))
-    dispatch(redux_setDiffIdx(0))
+    dispatch(redux_setDiffIdx(-1))
     setExcelData(diffData.diffObj, diffData.leftData, setLeftColumns, setLeftData, true)
     setExcelData(diffData.diffObj, diffData.rightData, setRightColumns, setRightData, false)
   }, [redux_sheet, leftDatas, rightDatas])
 
   useEffect(() => {
+    console.log('dddd', diff)
     const diffIdxs = Object.keys(diff).map(v=>+v).sort(()=>1)
     const index = diffIdxs[redux_diffIdx]
     if (index === 0) return

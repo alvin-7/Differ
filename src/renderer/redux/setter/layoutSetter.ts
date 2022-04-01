@@ -13,7 +13,7 @@ interface SetterState {
 const initialState: SetterState = {
   sheets: [],
   sheet: '',
-  diffIdx: 0,
+  diffIdx: -1,
   diffLen: 0
 }
 
