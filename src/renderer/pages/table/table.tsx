@@ -109,7 +109,7 @@ function rowClassRenderWrap(diff: diffType, page: number, left=true) {
 }
 
 function handleScroll(index: number) {
-  console.log(index)
+  diffScroll = 0
   scrollIntoView(document.querySelector(`.scroll-row-${index}`), {
     align: {
       top: 0,
@@ -197,8 +197,7 @@ const TableDiff = () => {
     const index = diffIdxs[redux_diffIdx]
     if (index === 0) return
     const page_diff = Math.ceil(index / MAX_PAGE_SIZE)
-    console.log('xxxx', index)
-    if (page_diff > 0) {
+    if (page_diff > 0 && page_diff !== page) {
       setPage(page_diff)
       diffScroll = index
     } else {
@@ -206,12 +205,11 @@ const TableDiff = () => {
     }
   }, [redux_diffIdx])
 
-  function rowOnChange() {
+  useEffect(() => {
     if (diffScroll !== 0) {
-      handleScroll(diffScroll)
-      diffScroll = 0
+      setTimeout(() => handleScroll(diffScroll), 100)
     }
-  }
+  }, [page])
 
   if (first) {
     first = false
@@ -246,7 +244,6 @@ const TableDiff = () => {
             tableLayout="fixed"
             scroll={{ y: scrollY, x: '100vw' }}
             rowClassName={rowClassRenderWrap(diff, page, true)}
-            onChange={rowOnChange}
           ></Table>
         </Col>
         <Col span={12}>
