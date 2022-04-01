@@ -194,7 +194,6 @@ const TableDiff = () => {
   }, [redux_sheet, leftDatas, rightDatas])
 
   useEffect(() => {
-    console.log('dddd', diff)
     const diffIdxs = Object.keys(diff).map(v=>+v).sort(()=>1)
     const index = diffIdxs[redux_diffIdx]
     if (index === 0) return

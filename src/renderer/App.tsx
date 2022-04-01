@@ -19,7 +19,6 @@ const App = () => {
 
   const onClickDiffScroll = function(pre=true) {
     return () => {
-      console.log('xxxxxxx', redux_diffIdx, redux_diffLen)
       const idx = pre ? redux_diffIdx - 1 : redux_diffIdx + 1
       if (idx < -1)  return
       if (idx > redux_diffLen)  return
