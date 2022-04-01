@@ -79,6 +79,7 @@
     "@types/react": "^17.0.43",
     "@types/react-dom": "^17.0.14",
     "@types/react-window": "^1.8.5",
+    "@types/scroll-into-view": "^1.16.0",
     "@types/xlsx": "^0.0.36",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
@@ -108,6 +109,7 @@
     "react-dom": "^17.0.2",
     "react-redux": "^7.2.6",
     "react-window": "^1.8.6",
+    "scroll-into-view": "^1.16.0",
     "xlsx": "^0.18.5"
   }
 }

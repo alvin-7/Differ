@@ -3,11 +3,12 @@ import React, { useState, useEffect } from 'react';
 //redux
 import { useAppSelector, useAppDispatch } from '../../redux/hooks';
 import { RootState } from '../../redux/store';
-import { setSheet as redux_setSheet, setSheets as redux_setSheets } from '../../redux/setter/layoutSetter';
+import { setSheet as redux_setSheet, setSheets as redux_setSheets, setDiffLen as redux_setDiffLen } from '../../redux/setter/layoutSetter';
+import scrollIntoView from "scroll-into-view";
 
 import './styles.less'
 
-const MAX_PAGE_SIZE = 100
+const MAX_PAGE_SIZE = 5
 
 type diffType = { [key: string]: object }
 
@@ -93,7 +94,7 @@ function itemRenderWrap(diff: diffType, rowKey: string, left = true) {
       if (left) return <div className='diff-row-left-item'>{text}</div>
       else return <div className='diff-row-right-item'>{text}</div>
     }
-    return <div className='row-item-common'>{text}</div>
+    return <div className='diff-row-common-item'>{text}</div>
   }
 }
 
@@ -101,9 +102,20 @@ function rowClassRenderWrap(diff: diffType, page: number, left=true) {
   return (record: any, index: number) => {
     index = (page - 1) * MAX_PAGE_SIZE + index + 1
     if (index in diff && JSON.stringify(diff[index]) !== '{}') {
-      return left ? 'diff-row-left' : 'diff-row-right'
+      return (left ? 'diff-row-left' : 'diff-row-right') + ` scroll-row-${index}`
     }
+    return 'diff-row-common' + ` scroll-row-${index}`
   }
+}
+
+function handleScroll(index: number) {
+  console.log(index)
+  scrollIntoView(document.querySelector(`.scroll-row-${index}`), {
+    align: {
+      top: 0,
+      left: 0
+    }
+  });
 }
 
 // 绑定两个表格的滚动事件
@@ -131,11 +143,14 @@ function bindTableScrollEvent() {
   })
 }
 
+
 let first = true
+let diffScroll = 0
 
 const TableDiff = () => {
   //redux
-  const sheet = useAppSelector((state: RootState) => state.setter.sheet)
+  const redux_sheet = useAppSelector((state: RootState) => state.setter.sheet)
+  const redux_diffIdx = useAppSelector((state: RootState) => state.setter.diffIdx)
   const dispatch = useAppDispatch()
 
   const [leftColumns, setLeftColumns] = useState([])
@@ -165,16 +180,38 @@ const TableDiff = () => {
   }, [leftDatas, rightDatas])
 
   useEffect(() => {
-    if (!sheet) return
-    leftDatas[sheet]?.splice(0, 0, {})
-    rightDatas[sheet]?.splice(0, 0, {})
-    const leftD = leftDatas[sheet] || []
-    const rightD = rightDatas[sheet] || []
+    if (!redux_sheet) return
+    leftDatas[redux_sheet]?.splice(0, 0, {})
+    rightDatas[redux_sheet]?.splice(0, 0, {})
+    const leftD = leftDatas[redux_sheet] || []
+    const rightD = rightDatas[redux_sheet] || []
     const diffData = window.electronAPI.diffArrays(leftD, rightD)
     setDiff(diffData.diffObj)
+    dispatch(redux_setDiffLen(Object.keys(diffData.diffObj).length))
     setExcelData(diffData.diffObj, diffData.leftData, setLeftColumns, setLeftData, true)
     setExcelData(diffData.diffObj, diffData.rightData, setRightColumns, setRightData, false)
-  }, [sheet, leftDatas, rightDatas])
+  }, [redux_sheet, leftDatas, rightDatas])
+
+  useEffect(() => {
+    const diffIdxs = Object.keys(diff).map(v=>+v).sort(()=>1)
+    const index = diffIdxs[redux_diffIdx]
+    if (index === 0) return
+    const page_diff = Math.ceil(index / MAX_PAGE_SIZE)
+    console.log('xxxx', index)
+    if (page_diff > 0) {
+      setPage(page_diff)
+      diffScroll = index
+    } else {
+      handleScroll(index)
+    }
+  }, [redux_diffIdx])
+
+  function rowOnChange() {
+    if (diffScroll !== 0) {
+      handleScroll(diffScroll)
+      diffScroll = 0
+    }
+  }
 
   if (first) {
     first = false
@@ -209,6 +246,7 @@ const TableDiff = () => {
             tableLayout="fixed"
             scroll={{ y: scrollY, x: '100vw' }}
             rowClassName={rowClassRenderWrap(diff, page, true)}
+            onChange={rowOnChange}
           ></Table>
         </Col>
         <Col span={12}>
