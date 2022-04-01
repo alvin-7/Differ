@@ -8,7 +8,7 @@ import scrollIntoView from "scroll-into-view";
 
 import './styles.less'
 
-const MAX_PAGE_SIZE = 5
+const MAX_PAGE_SIZE = 100
 
 type diffType = { [key: string]: object }
 
