@@ -5,7 +5,10 @@ import { app, BrowserWindow, ipcMain } from 'electron';
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
-const isDev = 'ELECTRON_IS_DEV' in process.env ? Number.parseInt(process.env.ELECTRON_IS_DEV) === 1 : !app.isPackaged;
+const isDev =
+  'ELECTRON_IS_DEV' in process.env
+    ? Number.parseInt(process.env.ELECTRON_IS_DEV) === 1
+    : !app.isPackaged;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -23,10 +26,10 @@ const createWindow = (): void => {
       nodeIntegration: true,
       contextIsolation: true,
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
-    }
+    },
   });
-  mainWindow.maximize()
-  mainWindow.show()
+  mainWindow.maximize();
+  mainWindow.show();
 
   // and load the index.html of the app.
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
@@ -35,11 +38,10 @@ const createWindow = (): void => {
   isDev && mainWindow.webContents.openDevTools();
   // mainWindow.webContents.openDevTools();
 
-
   mainWindow.on('resize', () => {
     // const sizeData = mainWindow.getContentSize()
     // mainWindow.webContents.send('resized', sizeData)
-  })
+  });
 };
 
 // This method will be called when Electron has finished
@@ -47,27 +49,25 @@ const createWindow = (): void => {
 // Some APIs can only be used after this event occurs.
 app.on('ready', () => {
   createWindow();
-  ipcMain.handle("ipc_excel_paths", (e, msg) => {
-    const paths = []
-    let excelPath = ''
-    let isPath = false
+  ipcMain.handle('ipc_excel_paths', (e, msg) => {
+    const paths = [];
+    let excelPath = '';
+    let isPath = false;
     for (const arg of process.argv) {
       if (arg === '--excel') {
-        isPath = true
-        if (excelPath) paths.push(excelPath)
-        excelPath = ''
-        continue
+        isPath = true;
+        if (excelPath) paths.push(excelPath);
+        excelPath = '';
+        continue;
       }
       if (isPath && isPath) {
-        excelPath += arg
+        excelPath += arg;
       }
     }
-    if (excelPath) paths.push(excelPath)
-    return paths
+    if (excelPath) paths.push(excelPath);
+    return paths;
   });
-
 });
-
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits

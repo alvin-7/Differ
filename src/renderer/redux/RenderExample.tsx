@@ -1,14 +1,14 @@
-import React from 'react'
+import React from 'react';
 
-import { useAppSelector, useAppDispatch } from './hooks'
-import type { RootState } from './store'
+import { useAppSelector, useAppDispatch } from './hooks';
+import type { RootState } from './store';
 
-import { decrement, increment } from './counter/counterSlice'
+import { decrement, increment } from './counter/counterSlice';
 
 export default function Counter() {
   // The `state` arg is correctly typed as `RootState` already
-  const count = useAppSelector((state: RootState) => state.counter.value)
-  const dispatch = useAppDispatch()
+  const count = useAppSelector((state: RootState) => state.counter.value);
+  const dispatch = useAppDispatch();
 
   return (
     <div>
@@ -28,5 +28,5 @@ export default function Counter() {
         </button>
       </div>
     </div>
-  )
+  );
 }

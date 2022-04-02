@@ -1,14 +1,16 @@
 import { IpcRenderer } from 'electron';
-import { ArrayChange  } from 'diff';
+import { ArrayChange } from 'diff';
 
 export interface IElectronAPI {
-  ipcRenderer: IpcRenderer,
+  ipcRenderer: IpcRenderer;
   // readXlsx: (path: string|ArrayBuffer) => any[],
-  readXlsx: (path: string|ArrayBuffer) => {[key: string]: [{[key:string]: string}]}={},
+  readXlsx: (path: string | ArrayBuffer) => {
+    [key: string]: [{ [key: string]: string }];
+  } = {};
 
   /**
    * diffArrays.
-   * 
+   *
    *     "13": {
    *         "H": "1"   [update or add]
    *     },
@@ -22,15 +24,18 @@ export interface IElectronAPI {
    *         "C": "1"   [update or add]
    *     }
    */
-  diffArrays: (leftData: any[], rightData: any[]) => {
+  diffArrays: (
     leftData: any[],
-    rightData: any[],
-    diffObj: {[key: number]: {[key: string]: string|undefined}},
-  }
+    rightData: any[]
+  ) => {
+    leftData: any[];
+    rightData: any[];
+    diffObj: { [key: number]: { [key: string]: string | undefined } };
+  };
 }
 
 declare global {
   interface Window {
-    electronAPI: IElectronAPI
+    electronAPI: IElectronAPI;
   }
 }
