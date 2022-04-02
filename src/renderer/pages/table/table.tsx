@@ -87,7 +87,7 @@ function setExcelData(
       columns[k] = {
         title: k,
         dataIndex: k,
-        // width: width,  // 默认就行
+        width: 200,  // 默认就行
         render: itemRenderWrap(diff, k, left),
         // key: k,
         // fixed: 'left'
