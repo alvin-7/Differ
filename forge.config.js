@@ -7,7 +7,8 @@ module.exports = {
         repository: {
           owner: 'alvin-7',
           name: "Differ"
-        }
+        },
+        draft: false
       }
     }
   ],
