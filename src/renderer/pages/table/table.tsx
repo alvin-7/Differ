@@ -226,6 +226,7 @@ const TableDiff = (props: TableProps) => {
     const diffData = window.electronAPI.diffArrays(leftD, rightD);
     setDiff(diffData.diffObj);
     const lineKeys = Object.keys(diffData.diffObj).map((v) => +v);
+    setPage(1)
     dispatch(redux_setDiffKeys(lineKeys));
     dispatch(redux_setDiffIdx(-1));
     setExcelData(
