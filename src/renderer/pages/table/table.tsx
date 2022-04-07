@@ -8,7 +8,6 @@ import {
   setSheets as redux_setSheets,
   setDiffKeys as redux_setDiffKeys,
   setDiffIdx as redux_setDiffIdx,
-  setDiffIdx,
 } from '../../redux/setter/layoutSetter';
 import scrollIntoView from 'scroll-into-view';
 
@@ -173,10 +172,16 @@ function bindTableScrollEvent() {
   });
 }
 
-let first = true;
 let diffScroll = 0;
 
-const TableDiff = () => {
+export type TableProps = {
+  lTitle? : string,
+  rTitle? : string,
+  lDatas? : { [key: string]: any },
+  rDatas? : { [key: string]: any } 
+}
+
+const TableDiff = (props: TableProps) => {
   //redux
   const dispatch = useAppDispatch();
   const redux_sheet = useAppSelector((state: RootState) => state.setter.sheet);
@@ -192,39 +197,32 @@ const TableDiff = () => {
   const [rightColumns, setRightColumns] = useState([]);
   const [rightData, setRightData] = useState([]);
 
-  const [leftDatas, setLeftDatas] = useState<{ [key: string]: any }>({}); // {sheet1: {sheetData}, sheet2: {sheetData}}
-  const [rightDatas, setRightDatas] = useState<{ [key: string]: any }>({});
-
   const [diff, setDiff] = useState<diffType>({});
   const [scrollY, setScrollY] = useState('');
 
-  const [leftTitle, setLeftTitle] = useState('');
-  const [rightTitle, setRightTitle] = useState('');
-
   const [page, setPage] = useState(1); // 当前页数
 
-  //页面加载完成后才能获取到对应的元素及其位置
   useEffect(() => {
+    // 页面加载完成后才能获取到对应的元素及其位置
     setScrollY(getTableScroll());
     bindTableScrollEvent();
-  }, []);
 
-  useEffect(() => {
+    // 数据初始化
     const sheetItems = new Set([
-      ...Object.keys(leftDatas),
-      ...Object.keys(rightDatas),
+      ...Object.keys(props.lDatas),
+      ...Object.keys(props.rDatas),
     ]);
     dispatch(redux_setSheets(Array.from(sheetItems)));
     const sheet_item = sheetItems.values().next().value;
     dispatch(redux_setSheet(sheet_item));
-  }, [leftDatas, rightDatas]);
+  }, []);
 
   useEffect(() => {
     if (!redux_sheet) return;
-    leftDatas[redux_sheet]?.splice(0, 0, {});
-    rightDatas[redux_sheet]?.splice(0, 0, {});
-    const leftD = leftDatas[redux_sheet] || [];
-    const rightD = rightDatas[redux_sheet] || [];
+    props.lDatas[redux_sheet]?.splice(0, 0, {});
+    props.rDatas[redux_sheet]?.splice(0, 0, {});
+    const leftD = props.lDatas[redux_sheet] || [];
+    const rightD = props.rDatas[redux_sheet] || [];
     const diffData = window.electronAPI.diffArrays(leftD, rightD);
     setDiff(diffData.diffObj);
     const lineKeys = Object.keys(diffData.diffObj).map((v) => +v);
@@ -244,7 +242,7 @@ const TableDiff = () => {
       setRightData,
       false
     );
-  }, [redux_sheet, leftDatas, rightDatas]);
+  }, [redux_sheet]);
 
   useEffect(() => {
     if (redux_diffKeys.indexOf(redux_diffIdx) === -1) return;
@@ -267,20 +265,6 @@ const TableDiff = () => {
     }
   }, [page]);
 
-  if (first) {
-    first = false;
-    const ipc = window.electronAPI.ipcRenderer;
-    ipc.invoke('ipc_excel_paths').then((excelPaths: string[]) => {
-      if (excelPaths.length) {
-        const leftDatas = window.electronAPI.readXlsx(excelPaths[0]);
-        const rightDatas = window.electronAPI.readXlsx(excelPaths[1]);
-        setLeftTitle(excelPaths[0]);
-        setRightTitle(excelPaths[1]);
-        setLeftDatas(leftDatas);
-        setRightDatas(rightDatas);
-      }
-    });
-  }
   return leftColumns && leftData && rightData ? (
     <Row>
       <Col span={12}>
@@ -288,7 +272,7 @@ const TableDiff = () => {
           className="diff-left-table"
           columns={leftColumns}
           dataSource={leftData}
-          title={() => leftTitle}
+          title={() => props.lTitle}
           pagination={{
             current: page,
             pageSize: MAX_PAGE_SIZE,
@@ -309,7 +293,7 @@ const TableDiff = () => {
           className="diff-right-table"
           columns={rightColumns}
           dataSource={rightData}
-          title={() => rightTitle}
+          title={() => props.rTitle}
           pagination={{
             current: page,
             pageSize: MAX_PAGE_SIZE,

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Button, Layout, Menu, Row, Col } from 'antd';
-import TableDiff from './pages/table/table';
+import TableDiff, { TableProps } from './pages/table/table';
 
 import { useAppSelector, useAppDispatch } from './redux/hooks';
 import type { RootState } from './redux/store';
@@ -9,7 +9,7 @@ import {
   setDiffIdx as redux_setDiffIdx,
 } from './redux/setter/layoutSetter';
 
-const { Header, Content, Footer } = Layout;
+const { Header, Content /*Footer*/ } = Layout;
 
 import './App.less';
 
@@ -25,6 +25,24 @@ const App = () => {
     (state: RootState) => state.setter.diffKeys
   );
   const dispatch = useAppDispatch();
+
+  const [tableState, setTableState] = React.useState({} as TableProps);
+
+  React.useEffect(() => {
+    const ipc = window.electronAPI.ipcRenderer;
+    ipc.invoke('ipc_excel_paths').then((excelPaths: string[]) => {
+      if (excelPaths.length) {
+        const leftDatas = window.electronAPI.readXlsx(excelPaths[0]);
+        const rightDatas = window.electronAPI.readXlsx(excelPaths[1]);
+        setTableState({
+          lTitle: excelPaths[0],
+          rTitle: excelPaths[0],
+          lDatas: leftDatas,
+          rDatas: rightDatas,
+        });
+      }
+    });
+  }, []);
 
   const onClickDiffScroll = function (pre = true) {
     return () => {
@@ -83,8 +101,14 @@ const App = () => {
           style={{ padding: '24px 0' }}
         >
           <Content style={{ padding: '0 24px', minHeight: 280 }}>
-            {/* <CodeDiffer/> */}
-            <TableDiff></TableDiff>
+            {tableState.lTitle ? (
+              <TableDiff
+                lTitle={tableState.lTitle}
+                rTitle={tableState.rTitle}
+                lDatas={tableState.lDatas}
+                rDatas={tableState.rDatas}
+              />
+            ) : null}
           </Content>
         </Layout>
       </Content>
