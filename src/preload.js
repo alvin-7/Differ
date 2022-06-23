@@ -20,6 +20,7 @@ function SheetToJson(workbookSheets) {
       const col = matchRst[1];
       if (!(row in rowsData)) rowsData[row] = {};
       rowsData[row][col] = sheetData[colKey].v + '';
+      rowsData[row][col] = rowsData[row][col].replaceAll('\r\n', '\n')
     }
     for (let i = 0; i < rowsData.length; i++) {
       if (!rowsData[i]) rowsData[i] = {};
@@ -64,15 +65,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
         Object.assign(pre, ob);
         return pre;
       };
-    };
-    const deepDiff = (left, right) => {
-      const leftItem = left
-        ? left.value.reduce(valueReducer(leftObj, leftData), {})
-        : [];
-      const rightItem = right
-        ? right.value.reduce(valueReducer(rightObj, rightData), {})
-        : [];
-      return diff(leftItem, rightItem);
     };
 
     const sampleDiff = diffArrays(
@@ -128,6 +120,16 @@ contextBridge.exposeInMainWorld('electronAPI', {
       rightData.splice(rightLine, 0, ...Array(removeObj.count).fill(''));
       diffItems.push([removeObj, null]);
     }
+
+    const deepDiff = (left, right) => {
+      const leftItem = left
+        ? left.value.reduce(valueReducer(leftObj, leftData), {})
+        : [];
+      const rightItem = right
+        ? right.value.reduce(valueReducer(rightObj, rightData), {})
+        : [];
+      return diff(leftItem, rightItem);
+    };
 
     for (const item of diffItems) {
       Object.assign(diffObj, deepDiff(item[0], item[1]));

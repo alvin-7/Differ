@@ -36,7 +36,7 @@ const App = () => {
         const rightDatas = window.electronAPI.readXlsx(excelPaths[1]);
         setTableState({
           lTitle: excelPaths[0],
-          rTitle: excelPaths[0],
+          rTitle: excelPaths[1],
           lDatas: leftDatas,
           rDatas: rightDatas,
         });
