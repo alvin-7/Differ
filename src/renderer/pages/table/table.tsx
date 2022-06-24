@@ -206,6 +206,8 @@ export type TableProps = {
   rDatas? : { [key: string]: any } 
 }
 
+const diffOriData: {[key: string]: any} = {};
+
 const TableDiff = (props: TableProps) => {
   //redux
   const dispatch = useAppDispatch();
@@ -227,6 +229,7 @@ const TableDiff = (props: TableProps) => {
 
   const [page, setPage] = useState(1); // 当前页数
 
+
   useEffect(() => {
     // 页面加载完成后才能获取到对应的元素及其位置
     setScrollY(getTableScroll());
@@ -237,18 +240,25 @@ const TableDiff = (props: TableProps) => {
       ...Object.keys(props.lDatas),
       ...Object.keys(props.rDatas),
     ]);
-    dispatch(redux_setSheets(Array.from(sheetItems)));
-    const sheet_item = sheetItems.values().next().value;
-    dispatch(redux_setSheet(sheet_item));
+    for (const sheetItem of Array.from(sheetItems)) {
+      props.lDatas[sheetItem]?.splice(0, 0, {});
+      props.rDatas[sheetItem]?.splice(0, 0, {});
+      const leftD = props.lDatas[sheetItem] || [];
+      const rightD = props.rDatas[sheetItem] || [];
+      const diffData = window.electronAPI.diffArrays(leftD, rightD);
+      if (diffData.diffObj && Object.keys(diffData.diffObj).length > 0) {
+        diffOriData[sheetItem] = diffData;
+      }
+    }
+
+    const sheetNames = Object.keys(diffOriData)
+    dispatch(redux_setSheets(sheetNames));
+    dispatch(redux_setSheet(sheetNames[0]));
   }, []);
 
   useEffect(() => {
     if (!redux_sheet) return;
-    props.lDatas[redux_sheet]?.splice(0, 0, {});
-    props.rDatas[redux_sheet]?.splice(0, 0, {});
-    const leftD = props.lDatas[redux_sheet] || [];
-    const rightD = props.rDatas[redux_sheet] || [];
-    const diffData = window.electronAPI.diffArrays(leftD, rightD);
+    const diffData = diffOriData[redux_sheet];
     setDiff(diffData.diffObj);
     const lineKeys = Object.keys(diffData.diffObj).map((v) => +v);
     setPage(1)
