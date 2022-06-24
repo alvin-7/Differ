@@ -68,6 +68,8 @@ function setExcelData(
   columns['Index'] = {
     title: 'Index',
     width: 80,
+    fixed: "left",
+    align: "center",
     render: (text: string, record: object, index: number) => `${index + 1}`,
   };
   const data = [];
@@ -86,7 +88,7 @@ function setExcelData(
       columns[k] = {
         title: k,
         dataIndex: k,
-        width: 200,  // 默认就行
+        width: 150,  // 默认就行
         // render: itemRenderWrap(diff, k, left),
         onCell: cellRenderWrap(diff, k, left),
         // key: k,
@@ -156,9 +158,7 @@ function handleScroll(index: number) {
 // 绑定两个表格的滚动事件
 function bindTableScrollEvent() {
   const leftTable = document.querySelector('.diff-left-table .ant-table-body');
-  const rightTable = document.querySelector(
-    '.diff-right-table .ant-table-body'
-  );
+  const rightTable = document.querySelector('.diff-right-table .ant-table-body');
   let scrollLock = false;
   leftTable.addEventListener('scroll', function () {
     if (
@@ -186,6 +186,15 @@ function bindTableScrollEvent() {
     leftTable.scrollTop = rightTable.scrollTop;
     scrollLock = false;
   });
+}
+
+function resetScrollNumber() {
+  const leftTable = document.querySelector('.diff-left-table .ant-table-body');
+  const rightTable = document.querySelector('.diff-right-table .ant-table-body');
+  leftTable.scrollLeft = 0;
+  leftTable.scrollTop = 0;
+  rightTable.scrollLeft = 0;
+  rightTable.scrollTop = 0;
 }
 
 let diffScroll = 0;
@@ -266,6 +275,7 @@ const TableDiff = (props: TableProps) => {
     const page_diff = Math.ceil(redux_diffIdx / MAX_PAGE_SIZE);
     if (page_diff > 0 && page_diff !== page) {
       diffScroll = redux_diffIdx;
+      resetScrollNumber();
       setPage(page_diff);
     } else {
       handleScroll(redux_diffIdx);
@@ -301,7 +311,7 @@ const TableDiff = (props: TableProps) => {
           // size="middle"
           // scroll={{ x: '100vw', y: '100vh' }}
           tableLayout="fixed"
-          scroll={{ y: scrollY, x: '100vw' }}
+          scroll={{ y: scrollY, x: '100%' }}
           rowClassName={rowClassRenderWrap(diff, page, true)}
         ></Table>
       </Col>
@@ -322,7 +332,7 @@ const TableDiff = (props: TableProps) => {
           // size="middle"
           // scroll={{ x: '100vw', y: '100vh' }}
           // tableLayout="fixed"
-          scroll={{ y: scrollY, x: '100vw' }}
+          scroll={{ y: scrollY, x: '100%' }}
           tableLayout="fixed"
           rowClassName={rowClassRenderWrap(diff, page, false)}
         ></Table>
