@@ -25,7 +25,7 @@ type diffType = { [key: string]: object };
 function getTableScroll({ extraHeight, ref }: { [key: string]: any } = {}) {
   if (typeof extraHeight == 'undefined') {
     //  默认底部分页64 + 边距10
-    extraHeight = 74 + 70;
+    extraHeight = 40 + 70;
   }
   let tHeader = null;
   if (ref && ref.current) {
@@ -298,6 +298,7 @@ const TableDiff = (props: TableProps) => {
     } else if (redux_diffIdx >= 0) {
       // it set
       const curLine = (page - 1) * MAX_PAGE_SIZE;
+      console.error('curline', curLine)
       dispatch(redux_setDiffIdx(curLine));
     }
   }, [page]);
