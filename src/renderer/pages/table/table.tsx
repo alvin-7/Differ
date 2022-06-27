@@ -136,7 +136,8 @@ function cellRenderWrap(diff: diffType, rowKey: string, left = true) {
 function rowClassRenderWrap(diff: diffType, page: number, left = true) {
   return (record: any, index: number) => {
     index = (page - 1) * MAX_PAGE_SIZE + index + 1;
-    if (index in diff && JSON.stringify(diff[index]) !== '{}') {
+    // if (index in diff && JSON.stringify(diff[index]) !== '{}') {
+    if (index in diff) {
       return (
         (left ? 'diff-row-left' : 'diff-row-right') + ` scroll-row-${index}`
       );
