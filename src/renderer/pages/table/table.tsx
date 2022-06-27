@@ -78,11 +78,8 @@ function setExcelData(
     const keys = Object.keys(itemD);
     const dItem: { [key: string]: string | number } = {};
     for (const k of keys) {
-      // const cArr = itemD[k].match(/[^x00-xff]/ig);
-      // const width = ((itemD[k] + '').length + (cArr ? cArr.length : 0)) * 3
       dItem[k] = itemD[k];
       if (k in columns) {
-        // columns[k].width = Math.min(Math.max(+columns[k].width, width), 300)
         continue;
       }
       columns[k] = {
@@ -91,8 +88,6 @@ function setExcelData(
         width: 150,  // 默认就行
         render: itemRenderWrap(diff, k, left),
         onCell: cellRenderWrap(diff, k, left),
-        // key: k,
-        // fixed: 'left'
       };
     }
     dItem.key = i;
@@ -105,18 +100,15 @@ function setExcelData(
 function cellRenderWrap(diff: diffType, rowKey: string, left = true) {
   return (record: { [key: string]: string | number }, index: number) => {
     const key = record.key;
-    const commonStyle = {
-      maxHeight: 40,
-    }
     if (key in diff && diff[key] && rowKey in diff[key]) {
       if (left) {
-        return {...commonStyle, className: "diff-row-left-item" }
+        return {className: "diff-row-left-item" }
       }
       else {
-        return {...commonStyle, className: "diff-row-right-item" }
+        return {className: "diff-row-right-item" }
       }
     }
-    return {...commonStyle, className: "diff-row-common-item" }
+    return {className: "diff-row-common-item" }
   };
 }
 

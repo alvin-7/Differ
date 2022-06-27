@@ -58,7 +58,6 @@ const App = () => {
           }
         }
       }
-      console.error('curline', redux_diffKeys, line)
       if (line !== -1) dispatch(redux_setDiffIdx(line));
     };
   };
