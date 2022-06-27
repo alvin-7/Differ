@@ -134,6 +134,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
     for (const item of diffItems) {
       Object.assign(diffObj, deepDiff(item[0], item[1]));
     }
+    for (const key in diffObj) {
+      if (JSON.stringify(diffObj[key]) === '{}') {
+        delete diffObj[key]
+      }
+    }
+
     return {
       leftData: leftData,
       rightData: rightData,

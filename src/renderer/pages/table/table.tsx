@@ -299,7 +299,6 @@ const TableDiff = (props: TableProps) => {
     } else if (redux_diffIdx >= 0) {
       // it set
       const curLine = (page - 1) * MAX_PAGE_SIZE;
-      console.error('curline', curLine)
       dispatch(redux_setDiffIdx(curLine));
     }
   }, [page]);

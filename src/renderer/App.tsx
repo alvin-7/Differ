@@ -58,6 +58,7 @@ const App = () => {
           }
         }
       }
+      console.error('curline', redux_diffKeys, line)
       if (line !== -1) dispatch(redux_setDiffIdx(line));
     };
   };
@@ -85,11 +86,11 @@ const App = () => {
             </Col>
             <Col>
               <Button type="primary" onClick={onClickDiffScroll(true)}>
-                上一个Diff
+                Pre Diff
               </Button>
               &nbsp;&nbsp;
               <Button type="primary" onClick={onClickDiffScroll(false)}>
-                下一个Diff
+                Next Diff
               </Button>
             </Col>
           </Row>
