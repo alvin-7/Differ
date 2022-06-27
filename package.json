@@ -1,7 +1,7 @@
 {
   "name": "diff-app",
   "productName": "Differ",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "My Electron application description",
   "main": ".webpack/main",
   "scripts": {
