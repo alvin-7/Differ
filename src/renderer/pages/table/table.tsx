@@ -1,4 +1,4 @@
-import { Row, Col, Table } from 'antd';
+import { Row, Col, Table, Tooltip } from 'antd';
 import React, { useState, useEffect } from 'react';
 //redux
 import { useAppSelector, useAppDispatch } from '../../redux/hooks';
@@ -89,7 +89,7 @@ function setExcelData(
         title: k,
         dataIndex: k,
         width: 150,  // 默认就行
-        // render: itemRenderWrap(diff, k, left),
+        render: itemRenderWrap(diff, k, left),
         onCell: cellRenderWrap(diff, k, left),
         // key: k,
         // fixed: 'left'
@@ -105,33 +105,39 @@ function setExcelData(
 function cellRenderWrap(diff: diffType, rowKey: string, left = true) {
   return (record: { [key: string]: string | number }, index: number) => {
     const key = record.key;
+    const commonStyle = {
+      maxHeight: 40,
+    }
     if (key in diff && diff[key] && rowKey in diff[key]) {
       if (left) {
-        return { className: "diff-row-left-item" }
+        return {...commonStyle, className: "diff-row-left-item" }
       }
       else {
-        return { className: "diff-row-right-item" }
+        return {...commonStyle, className: "diff-row-right-item" }
       }
     }
-    return { className: "diff-row-common-item" }
+    return {...commonStyle, className: "diff-row-common-item" }
   };
 }
 
-// function itemRenderWrap(diff: diffType, rowKey: string, left = true) {
-//   return (
-//     text: string,
-//     record: { [key: string]: string | number },
-//     index: number
-//   ) => {
-//     if (!text) return text;
-//     const key = record.key;
-//     if (key in diff && diff[key] && rowKey in diff[key]) {
-//       if (left) return <div className="diff-row-left-item">{text}</div>;
-//       else return <div className="diff-row-right-item">{text}</div>;
-//     }
-//     return <div className="diff-row-common-item">{text}</div>;
-//   };
-// }
+function itemRenderWrap(diff: diffType, rowKey: string, left = true) {
+  return (
+    text: string,
+    record: { [key: string]: string | number },
+    index: number
+  ) => {
+    // if (!text) return text;
+    // const key = record.key;
+    // if (key in diff && diff[key] && rowKey in diff[key]) {
+    //   if (left) return <div className="diff-row-left-item">{text}</div>;
+    //   else return <div className="diff-row-right-item">{text}</div>;
+    // }
+    // return <div className="diff-row-common-item">{text}</div>;
+    return <Tooltip placement='top' title={text}>
+      <div className='ellipsis'>{text}</div>
+    </Tooltip>
+  };
+}
 
 function rowClassRenderWrap(diff: diffType, page: number, left = true) {
   return (record: any, index: number) => {

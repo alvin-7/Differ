@@ -3,6 +3,10 @@
   padding: 8px 8px 8px 8px !important;
 }
 
+.ant-table-row {
+  // overflow-x: hidden;
+}
+
 .diff-row-left {
   background-color: rgb(220, 220, 255);
 }
@@ -13,18 +17,28 @@
 .diff-row-common {
 }
 
-.diff-row-left-item {
+.ellipsis {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  word-break: break-all;
+}
+
+.ant-table-body .ant-table-cell {
   user-select: text;
+}
+
+.diff-row-left-item {
   background-color: rgb(255, 200, 100);
 }
 
 .diff-row-right-item {
-  user-select: text;
   background-color: rgb(255, 255, 0);
 }
 
 .diff-row-common-item {
-  user-select: text;
 }
 
 .diff-left-table {
