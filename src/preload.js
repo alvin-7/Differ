@@ -54,18 +54,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
         return str;
       };
     };
-    const valueReducer = function (obj, srcObj) {
-      return (pre, cur) => {
-        const o = obj[cur];
-        const ob = {};
-        for (const i in o) {
-          const idx = srcObj.indexOf(o[i]);
-          ob[idx] = o[i];
-        }
-        Object.assign(pre, ob);
-        return pre;
-      };
-    };
 
     const sampleDiff = diffArrays(
       leftData.map(itemFunc(leftObj)),
@@ -76,6 +64,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     const diffItems = [];
     let leftLine = 0;
     let rightLine = 0;
+    let removeLine = 0;
     for (let i = 0; i < sampleDiff.length; i++) {
       const diffItem = sampleDiff[i];
       const lineNum = diffItem.count;
@@ -83,33 +72,25 @@ contextBridge.exposeInMainWorld('electronAPI', {
         //表示左边被移除行
         leftLine += lineNum;
         removeObj = diffItem;
+        removeLine = lineNum;
       } else if (diffItem.added) {
         //表示右边添加行
         rightLine += lineNum;
         const addObj = diffItem;
         if (removeObj) {
           //表示移除左边，并添加右边
-          const addLen = removeObj.value.length - lineNum;
-          // const start = removeObj.value.length ? removeObj.value[0]
-          if (addLen > 0) {
-            rightData.splice(rightLine, 0, ...Array(addLen).fill(''));
-          } else if (addLen < 0) {
-            leftData.splice(leftLine, 0, ...Array(-addLen).fill(''));
-          }
-          diffItems.push([removeObj, addObj]);
+          diffItems.push([removeObj, addObj, leftLine-removeLine, rightLine-lineNum]);
           removeObj = null;
         } else {
           //仅仅是右边添加，没有移除左边
-          leftData.splice(leftLine, 0, ...Array(lineNum).fill(''));
-          diffItems.push([null, addObj]);
+          diffItems.push([null, addObj, leftLine-removeLine, rightLine-lineNum]);
         }
       } else if (removeObj) {
         //表示左边被移除，但是没有添加   也就是右边需要添加几个空行
         leftLine += lineNum;
         rightLine += lineNum;
 
-        rightData.splice(rightLine, 0, ...Array(lineNum).fill(''));
-        diffItems.push([removeObj, null]);
+        diffItems.push([removeObj, null, leftLine-lineNum-removeLine, rightLine-lineNum]);
         removeObj = null;
       } else {
         leftLine += lineNum;
@@ -117,27 +98,55 @@ contextBridge.exposeInMainWorld('electronAPI', {
       }
     }
     if (removeObj) {
-      rightData.splice(rightLine, 0, ...Array(removeObj.count).fill(''));
-      diffItems.push([removeObj, null]);
+      diffItems.push([removeObj, null, leftLine-removeLine, rightLine]);
     }
 
-    const deepDiff = (left, right) => {
-      const leftItem = left
-        ? left.value.reduce(valueReducer(leftObj, leftData), {})
-        : [];
-      const rightItem = right
-        ? right.value.reduce(valueReducer(rightObj, rightData), {})
-        : [];
-      return diff(leftItem, rightItem);
-    };
-
+    const addLines = [0, 0]
     for (const item of diffItems) {
-      Object.assign(diffObj, deepDiff(item[0], item[1]));
-    }
-    for (const key in diffObj) {
-      if (JSON.stringify(diffObj[key]) === '{}') {
-        delete diffObj[key]
+      item[2] += addLines[0]
+      item[3] += addLines[1]
+      addLines[0] = 0
+      addLines[1] = 0
+      if (!item[0] && item[1]?.added) {
+        // 右边增加行，说明需要给左边加空行
+        item[2] += 1
+        leftData.splice(item[2], 0, ...Array(item[1].count).fill(''));
+        addLines[0] += item[1].count
+      } else if (item[0]?.removed && !item[1]) {
+        // 左边删除行，说明需要给右边加空行
+        item[3] += 1
+        rightData.splice(item[3], 0, ...Array(item[0].count).fill(''));
+        addLines[1] += item[0].count
       }
+    }
+    console.error('diffItems end', diffItems)
+
+    // TODO deepDiff
+    // const valueReducer = function (obj, srcObj) {
+    //   return (pre, cur) => {
+    //     const o = obj[cur];
+    //     const ob = {};
+    //     for (const i in o) {
+    //       const idx = srcObj.indexOf(o[i]);
+    //       ob[idx] = o[i];
+    //     }
+    //     Object.assign(pre, ob);
+    //     return pre;
+    //   };
+    // };
+    // const deepDiff = (left, right) => {
+    //   const leftItem = left
+    //     ? left.value.reduce(valueReducer(leftObj, leftData), {})
+    //     : [];
+    //   const rightItem = right
+    //     ? right.value.reduce(valueReducer(rightObj, rightData), {})
+    //     : [];
+    //   return diff(leftItem, rightItem);
+    // };
+    for (const item of diffItems) {
+      const data = {}
+      data[item[2]] = diff(leftData[item[2]], rightData[item[3]])
+      Object.assign(diffObj, data);
     }
 
     return {

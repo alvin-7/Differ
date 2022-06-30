@@ -118,13 +118,6 @@ function itemRenderWrap(diff: diffType, rowKey: string, left = true) {
     record: { [key: string]: string | number },
     index: number
   ) => {
-    // if (!text) return text;
-    // const key = record.key;
-    // if (key in diff && diff[key] && rowKey in diff[key]) {
-    //   if (left) return <div className="diff-row-left-item">{text}</div>;
-    //   else return <div className="diff-row-right-item">{text}</div>;
-    // }
-    // return <div className="diff-row-common-item">{text}</div>;
     return <Tooltip placement='top' title={text}>
       <div className='ellipsis'>{text}</div>
     </Tooltip>
@@ -135,7 +128,10 @@ function rowClassRenderWrap(diff: diffType, page: number, left = true) {
   return (record: any, index: number) => {
     index = (page - 1) * MAX_PAGE_SIZE + index + 1;
     // if (index in diff && JSON.stringify(diff[index]) !== '{}') {
-    if (index in diff) {
+    if (index in diff && (left ? true : diff[index] )) {
+      if (left && !diff[index]) {
+        return 'diff-row-delete' + ` scroll-row-${index}`
+      }
       return (
         (left ? 'diff-row-left' : 'diff-row-right') + ` scroll-row-${index}`
       );
@@ -206,6 +202,7 @@ export type TableProps = {
 }
 
 const diffOriData: {[key: string]: any} = {};
+const diffRowData: {[key: string]: any} = {};
 
 const TableDiff = (props: TableProps) => {
   //redux
@@ -247,6 +244,16 @@ const TableDiff = (props: TableProps) => {
       const diffData = window.electronAPI.diffArrays(leftD, rightD);
       if (diffData.diffObj && Object.keys(diffData.diffObj).length > 0) {
         diffOriData[sheetItem] = diffData;
+        diffRowData[sheetItem] = {
+          'left': [],
+          'right': []
+        }
+        for (const row in diffData.diffObj) {
+          const val = diffData.diffObj[row]
+          if (val === undefined) {
+            diffRowData[sheetItem].left.push(row)
+          } 
+        }
       }
     }
 
