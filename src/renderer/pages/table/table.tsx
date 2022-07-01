@@ -101,10 +101,14 @@ function setExcelData(
 function cellRenderWrap(diffData: any, rowKey: string, left = true) {
   const diff: diffType = diffData.diffObj;
   const nullLines = left ? diffData.nullLines.left : diffData.nullLines.right;
+  const otherNullLines = !left ? diffData.nullLines.left : diffData.nullLines.right;
   return (record: { [key: string]: string | number }, index: number) => {
     const key = record.key;
     if (nullLines.indexOf(key) !== -1) {
       return {className: "diff-row-null" }
+    }
+    if (otherNullLines.indexOf(key) !== -1) {
+      return left ? {className: "diff-row-delete" }: {className: "diff-row-add" }
     }
     if (key in diff && diff[key] && rowKey in diff[key]) {
       if (left) {
