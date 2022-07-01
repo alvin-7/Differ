@@ -106,6 +106,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
       'left': [],
       'right': []
     }
+    const diffLines = []
     for (const item of diffItems) {
       item[2] += addLines[0]
       item[3] += addLines[1]
@@ -119,40 +120,38 @@ contextBridge.exposeInMainWorld('electronAPI', {
         addLines[0] += item[1].count
       } else if (item[0]?.removed && !item[1]) {
         // 左边删除行，说明需要给右边加空行
-        // item[3] += 1
         rightData.splice(item[3], 0, ...Array(item[0].count).fill(''));
         for (let i=0; i<item[0].count; i++) {
           nullLines.right.push(item[3]+i)
         }
         addLines[1] += item[0].count
+      } else if (item[0]?.removed && item[1].added) {
+        if (item[0].count > item[1].added) {
+          const diffCnt = item[0].count - item[1].count
+          rightData.splice(item[3], 0, ...Array(diffCnt).fill(''));
+          for (let i=0; i<diffCnt; i++) {
+            nullLines.right.push(item[3]+i)
+          }
+          addLines[1] += diffCnt
+          item[2] += diffCnt
+          item[3] += diffCnt
+        } else if (item[0].count < item[1].added){
+          const diffCnt = item[1].count - item[0].count
+          leftData.splice(item[2], 0, ...Array(diffCnt).fill(''));
+          for (let i=0; i<diffCnt; i++) {
+            nullLines.left.push(item[3]+i)
+          }
+          addLines[0] += diffCnt
+        }
+      }
+      for (let add=0; add<item[1].count; add++) {
+        diffLines.push([item[2]+add, item[3]+add])
       }
     }
 
-    // TODO deepDiff
-    // const valueReducer = function (obj, srcObj) {
-    //   return (pre, cur) => {
-    //     const o = obj[cur];
-    //     const ob = {};
-    //     for (const i in o) {
-    //       const idx = srcObj.indexOf(o[i]);
-    //       ob[idx] = o[i];
-    //     }
-    //     Object.assign(pre, ob);
-    //     return pre;
-    //   };
-    // };
-    // const deepDiff = (left, right) => {
-    //   const leftItem = left
-    //     ? left.value.reduce(valueReducer(leftObj, leftData), {})
-    //     : [];
-    //   const rightItem = right
-    //     ? right.value.reduce(valueReducer(rightObj, rightData), {})
-    //     : [];
-    //   return diff(leftItem, rightItem);
-    // };
-    for (const item of diffItems) {
+    for (const item of diffLines) {
       const data = {}
-      data[item[2]] = diff(leftData[item[2]], rightData[item[3]])
+      data[item[0]] = diff(leftData[item[0]], rightData[item[1]])
       Object.assign(diffObj, data);
     }
     console.error('ee', {
