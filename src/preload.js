@@ -110,48 +110,36 @@ contextBridge.exposeInMainWorld('electronAPI', {
     for (const item of diffItems) {
       item[2] += addLines[0]
       item[3] += addLines[1]
-      if (!item[0] && item[1]?.added) {
-        // 右边增加行，说明需要给左边加空行
-        item[2] += 1
-        leftData.splice(item[2], 0, ...Array(item[1].count).fill(''));
-        for (let i=0; i<item[1].count; i++) {
-          nullLines.left.push(item[2]+i)
-        }
-        addLines[0] += item[1].count
-      } else if (item[0]?.removed && !item[1]) {
-        // 左边删除行，说明需要给右边加空行
-        rightData.splice(item[3], 0, ...Array(item[0].count).fill(''));
-        for (let i=0; i<item[0].count; i++) {
-          nullLines.right.push(item[3]+i)
-        }
-        addLines[1] += item[0].count
-      } else if (item[0]?.removed && item[1].added) {
-        if (item[0].count > item[1].added) {
-          const diffCnt = item[0].count - item[1].count
+      let diffCnt = 0
+      if (item[0]?.removed || item[1].added) {
+        const leftCount = item[0]?.count || 0
+        const rightCount = item[1]?.count || 0
+        if (leftCount > rightCount) {
+          // 右边增加行比左边少， 右边需要加空行
+          diffCnt = leftCount - rightCount
           rightData.splice(item[3], 0, ...Array(diffCnt).fill(''));
           for (let i=0; i<diffCnt; i++) {
             nullLines.right.push(item[3]+i)
           }
           addLines[1] += diffCnt
-          item[2] += diffCnt
-          item[3] += diffCnt
-        } else if (item[0].count < item[1].added){
-          const diffCnt = item[1].count - item[0].count
-          leftData.splice(item[2], 0, ...Array(diffCnt).fill(''));
+        } else if (leftCount < rightCount){
+          // 右边增加行比左边多， 左边需要加空行
+          diffCnt = rightCount - leftCount
+          leftData.splice(item[3], 0, ...Array(diffCnt).fill(''));
           for (let i=0; i<diffCnt; i++) {
             nullLines.left.push(item[3]+i)
           }
           addLines[0] += diffCnt
         }
-      }
-      for (let add=0; add<item[1].count; add++) {
-        diffLines.push([item[2]+add, item[3]+add])
+        for (let add=0; add<Math.max(item[0]?.count||0, item[1]?.count||0); add++) {
+          diffLines.push(item[3]+add)
+        }
       }
     }
 
-    for (const item of diffLines) {
+    for (const line of diffLines) {
       const data = {}
-      data[item[0]] = diff(leftData[item[0]], rightData[item[1]])
+      data[line] = diff(leftData[line], rightData[line])
       Object.assign(diffObj, data);
     }
     console.error('ee', {
@@ -160,6 +148,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
       diffObj: diffObj,
       diffItems,
       nullLines,
+      diffLines,
     })
 
     return {
