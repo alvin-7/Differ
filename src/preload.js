@@ -102,6 +102,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
     }
 
     const addLines = [0, 0]
+    const nullLines = {
+      'left': [],
+      'right': []
+    }
     for (const item of diffItems) {
       item[2] += addLines[0]
       item[3] += addLines[1]
@@ -109,15 +113,20 @@ contextBridge.exposeInMainWorld('electronAPI', {
         // 右边增加行，说明需要给左边加空行
         item[2] += 1
         leftData.splice(item[2], 0, ...Array(item[1].count).fill(''));
+        for (let i=0; i<item[1].count; i++) {
+          nullLines.left.push(item[2]+i)
+        }
         addLines[0] += item[1].count
       } else if (item[0]?.removed && !item[1]) {
         // 左边删除行，说明需要给右边加空行
         // item[3] += 1
         rightData.splice(item[3], 0, ...Array(item[0].count).fill(''));
+        for (let i=0; i<item[0].count; i++) {
+          nullLines.right.push(item[3]+i)
+        }
         addLines[1] += item[0].count
       }
     }
-    console.error('diffItems end', diffItems)
 
     // TODO deepDiff
     // const valueReducer = function (obj, srcObj) {
@@ -151,6 +160,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
       leftData: leftData,
       rightData: rightData,
       diffObj: diffObj,
+      nullLines,
     };
   },
 });

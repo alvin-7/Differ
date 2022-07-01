@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, Menu, BrowserWindow, ipcMain } from 'electron';
 import updateApp from 'update-electron-app'
 import logger from 'electron-log'
 
@@ -96,3 +96,16 @@ app.on('activate', () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
+const menu = Menu.buildFromTemplate([
+  {
+      label: 'Version',
+      submenu: [
+          {
+              id: 'version',
+              label: app.getVersion(),
+              enabled: true
+          }
+      ]
+  },
+]);
+Menu.setApplicationMenu(menu);

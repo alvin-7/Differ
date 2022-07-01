@@ -12,6 +12,7 @@ import {
 import scrollIntoView from 'scroll-into-view';
 
 import './styles.less';
+import { diff } from 'deep-object-diff';
 
 const MAX_PAGE_SIZE = 100;
 
@@ -58,8 +59,7 @@ function getTableScroll({ extraHeight, ref }: { [key: string]: any } = {}) {
 }
 
 function setExcelData(
-  diff: diffType,
-  datas: any[],
+  diffData: any,
   setColumns: React.Dispatch<React.SetStateAction<any[]>>,
   setData: React.Dispatch<React.SetStateAction<any[]>>,
   left = true
@@ -72,6 +72,7 @@ function setExcelData(
     align: "center",
     render: (text: string, record: object, index: number) => `${index + 1}`,
   };
+  const datas: any[] = left ? diffData.leftData : diffData.rightData;
   const data = [];
   for (let i = 1; i < datas.length; i++) {
     const itemD = datas[i];
@@ -86,8 +87,8 @@ function setExcelData(
         title: k,
         dataIndex: k,
         width: 150,  // 默认就行
-        render: itemRenderWrap(diff, k, left),
-        onCell: cellRenderWrap(diff, k, left),
+        render: itemRenderWrap(diffData, k, left),
+        onCell: cellRenderWrap(diffData, k, left),
       };
     }
     dItem.key = i;
@@ -97,14 +98,18 @@ function setExcelData(
   setData(data);
 }
 
-function cellRenderWrap(diff: diffType, rowKey: string, left = true) {
+function cellRenderWrap(diffData: any, rowKey: string, left = true) {
+  const diff: diffType = diffData.diffObj;
+  const nullLines = left ? diffData.nullLines.left : diffData.nullLines.right;
   return (record: { [key: string]: string | number }, index: number) => {
     const key = record.key;
+    if (nullLines.indexOf(key) !== -1) {
+      return {className: "diff-row-null" }
+    }
     if (key in diff && diff[key] && rowKey in diff[key]) {
       if (left) {
         return {className: "diff-row-left-item" }
-      }
-      else {
+      } else {
         return {className: "diff-row-right-item" }
       }
     }
@@ -124,7 +129,7 @@ function itemRenderWrap(diff: diffType, rowKey: string, left = true) {
   };
 }
 
-function rowClassRenderWrap(diff: diffType, page: number, left = true) {
+function rowClassRenderWrap(diff: diffType, page: number, left: boolean) {
   return (record: any, index: number) => {
     index = (page - 1) * MAX_PAGE_SIZE + index + 1;
     // if (index in diff && JSON.stringify(diff[index]) !== '{}') {
@@ -202,7 +207,7 @@ export type TableProps = {
 }
 
 const diffOriData: {[key: string]: any} = {};
-const diffRowData: {[key: string]: any} = {};
+// const diffRowData: {[key: string]: any} = {};
 
 const TableDiff = (props: TableProps) => {
   //redux
@@ -244,16 +249,16 @@ const TableDiff = (props: TableProps) => {
       const diffData = window.electronAPI.diffArrays(leftD, rightD);
       if (diffData.diffObj && Object.keys(diffData.diffObj).length > 0) {
         diffOriData[sheetItem] = diffData;
-        diffRowData[sheetItem] = {
-          'left': [],
-          'right': []
-        }
-        for (const row in diffData.diffObj) {
-          const val = diffData.diffObj[row]
-          if (val === undefined) {
-            diffRowData[sheetItem].left.push(row)
-          } 
-        }
+        // diffRowData[sheetItem] = {
+        //   'left': [],
+        //   'right': []
+        // }
+        // for (const row in diffData.diffObj) {
+        //   const val = diffData.diffObj[row]
+        //   if (val === undefined) {
+        //     diffRowData[sheetItem].left.push(row)
+        //   } 
+        // }
       }
     }
 
@@ -271,15 +276,13 @@ const TableDiff = (props: TableProps) => {
     dispatch(redux_setDiffKeys(lineKeys));
     dispatch(redux_setDiffIdx(-1));
     setExcelData(
-      diffData.diffObj,
-      diffData.leftData,
+      diffData,
       setLeftColumns,
       setLeftData,
       true
     );
     setExcelData(
-      diffData.diffObj,
-      diffData.rightData,
+      diffData,
       setRightColumns,
       setRightData,
       false
