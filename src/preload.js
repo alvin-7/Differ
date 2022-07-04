@@ -142,14 +142,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
       data[line] = diff(leftData[line], rightData[line])
       Object.assign(diffObj, data);
     }
-    console.error('ee', {
-      leftData: leftData,
-      rightData: rightData,
-      diffObj: diffObj,
-      diffItems,
-      nullLines,
-      diffLines,
-    })
+    // console.error('ee', {
+    //   leftData: leftData,
+    //   rightData: rightData,
+    //   diffObj: diffObj,
+    //   diffItems,
+    //   nullLines,
+    //   diffLines,
+    // })
 
     return {
       leftData: leftData,

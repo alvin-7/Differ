@@ -1,6 +1,7 @@
 import * as React from 'react';
-import { Button, Layout, Menu, Row, Col } from 'antd';
+import { Button, Layout, Menu, Row, Col, Select } from 'antd';
 import TableDiff, { TableProps } from './pages/table/table';
+const { Option } = Select;
 
 import { useAppSelector, useAppDispatch } from './redux/hooks';
 import type { RootState } from './redux/store';
@@ -12,6 +13,8 @@ import {
 const { Header, Content /*Footer*/ } = Layout;
 
 import './App.less';
+
+const DiffButtonWidth = 90
 
 const App = () => {
   const redux_sheets = useAppSelector(
@@ -62,11 +65,15 @@ const App = () => {
     };
   };
 
+  function handleOptionChange(val: number) {
+      dispatch(redux_setDiffIdx(val));
+  }
+
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Header className="header">
         <div className="logo" />
-        {redux_sheets.length ? (
+        {redux_sheets.length && redux_diffKeys.length ? (
           <Row wrap={false} justify="space-between">
             <Col span={16}>
               <Menu
@@ -84,11 +91,16 @@ const App = () => {
               </Menu>
             </Col>
             <Col>
-              <Button type="primary" onClick={onClickDiffScroll(true)}>
+              <Button type="primary" style={{ width: DiffButtonWidth }} onClick={onClickDiffScroll(true)}>
                 Pre Diff
               </Button>
-              &nbsp;&nbsp;
-              <Button type="primary" onClick={onClickDiffScroll(false)}>
+              <Select defaultValue={redux_diffIdx} value={redux_diffIdx} style={{ width: 70 }} onChange={handleOptionChange}>
+                { redux_diffKeys.map((val: number) => (
+                    <Option key={val} value={val}>{val}</Option>
+                  ))
+                }
+              </Select>
+              <Button type="primary" style={{ width: DiffButtonWidth }} onClick={onClickDiffScroll(false)}>
                 Next Diff
               </Button>
             </Col>

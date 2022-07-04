@@ -12,7 +12,6 @@ import {
 import scrollIntoView from 'scroll-into-view';
 
 import './styles.less';
-import { diff } from 'deep-object-diff';
 
 const MAX_PAGE_SIZE = 100;
 
@@ -62,7 +61,7 @@ function setExcelData(
   diffData: any,
   setColumns: React.Dispatch<React.SetStateAction<any[]>>,
   setData: React.Dispatch<React.SetStateAction<any[]>>,
-  left = true
+  left = true,
 ) {
   const columns: { [key: string]: { [key: string]: any } } = {};
   columns['Index'] = {
@@ -70,7 +69,9 @@ function setExcelData(
     width: 80,
     fixed: "left",
     align: "center",
-    render: (text: string, record: object, index: number) => `${index + 1}`,
+    render: (text: string, record: { [key: string]: string | number }, index: number) => {
+      return `${Number(record.key)}`
+    },
   };
   const datas: any[] = left ? diffData.leftData : diffData.rightData;
   const data = [];
@@ -152,6 +153,7 @@ function rowClassRenderWrap(diff: diffType, page: number, left: boolean) {
 function handleScroll(index: number) {
   diffScroll = 0;
   scrollIntoView(document.querySelector(`.scroll-row-${index}`), {
+    time: 0,
     align: {
       top: 0,
       left: 0,
@@ -193,6 +195,7 @@ function bindTableScrollEvent() {
 }
 
 function resetScrollNumber() {
+  if (diffScroll) return
   const leftTable = document.querySelector('.diff-left-table .ant-table-body');
   const rightTable = document.querySelector('.diff-right-table .ant-table-body');
   leftTable.scrollLeft = 0;
@@ -283,13 +286,13 @@ const TableDiff = (props: TableProps) => {
       diffData,
       setLeftColumns,
       setLeftData,
-      true
+      true,
     );
     setExcelData(
       diffData,
       setRightColumns,
       setRightData,
-      false
+      false,
     );
   }, [redux_sheet]);
 
