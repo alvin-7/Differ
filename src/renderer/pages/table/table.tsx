@@ -150,8 +150,10 @@ function rowClassRenderWrap(diff: diffType, page: number, left: boolean) {
   };
 }
 
+let onHandleScroll = false
 function handleScroll(index: number) {
   diffScroll = 0;
+  onHandleScroll = true
   scrollIntoView(document.querySelector(`.scroll-row-${index}`), {
     time: 0,
     align: {
@@ -162,7 +164,7 @@ function handleScroll(index: number) {
 }
 
 // 绑定两个表格的滚动事件
-function bindTableScrollEvent() {
+function bindTableScrollEvent(dispatch: any) {
   const leftTable = document.querySelector('.diff-left-table .ant-table-body');
   const rightTable = document.querySelector('.diff-right-table .ant-table-body');
   let scrollLock = false;
@@ -178,6 +180,10 @@ function bindTableScrollEvent() {
     rightTable.scrollLeft = leftTable.scrollLeft;
     rightTable.scrollTop = leftTable.scrollTop;
     scrollLock = false;
+    if (!onHandleScroll) {
+      dispatch(redux_setDiffIdx(-1));
+    }
+    onHandleScroll = false
   });
   rightTable.addEventListener('scroll', function () {
     if (
@@ -191,6 +197,10 @@ function bindTableScrollEvent() {
     leftTable.scrollLeft = rightTable.scrollLeft;
     leftTable.scrollTop = rightTable.scrollTop;
     scrollLock = false;
+    if (!onHandleScroll) {
+      dispatch(redux_setDiffIdx(-1));
+    }
+    onHandleScroll = false
   });
 }
 
@@ -241,7 +251,7 @@ const TableDiff = (props: TableProps) => {
   useEffect(() => {
     // 页面加载完成后才能获取到对应的元素及其位置
     setScrollY(getTableScroll());
-    bindTableScrollEvent();
+    bindTableScrollEvent(dispatch);
 
     // 数据初始化
     const sheetItems = new Set([
