@@ -31,4 +31,4 @@ Maps to electronForge.publish, will attempt to make the forge application and th
 
 ## Usage
 
-* Excel Diff
+Differ.exe --excel /path/to/oldexcel --excel /path/to/newexcel
