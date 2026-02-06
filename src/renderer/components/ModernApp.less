@@ -1,0 +1,253 @@
+/* Excel 风格 UI - 无动画，直接显示 */
+
+:root {
+  --excel-green: #217346;
+  --excel-green-hover: #1a5c37;
+  --excel-header: #f2f2f2;
+  --excel-border: #d4d4d4;
+  --excel-grid: #e0e0e0;
+  --bg-white: #ffffff;
+  --bg-gray: #f5f5f5;
+  --text-primary: #333333;
+  --text-secondary: #666666;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 13px;
+  background: var(--bg-gray);
+  color: var(--text-primary);
+}
+
+/* Excel 风格应用 */
+.modern-app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-gray);
+}
+
+/* Excel 风格头部 - 类似 Excel 功能区 */
+.modern-header {
+  background: var(--bg-white);
+  border-bottom: 2px solid var(--excel-border);
+}
+
+.header-content {
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  background: var(--excel-header);
+}
+
+.header-section {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.header-section.tabs {
+  flex: 1;
+}
+
+.header-section.controls {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+/* Excel 风格按钮 - 扁平，无动画 */
+.modern-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  font-size: 13px;
+  font-weight: 400;
+  border-radius: 2px;
+  border: 1px solid var(--excel-border);
+  cursor: pointer;
+  background: white;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.modern-button:hover {
+  background: #e8e8e8;
+  border-color: #adadad;
+}
+
+.modern-button:active {
+  background: #d4d4d4;
+}
+
+.modern-button-primary {
+  background: var(--excel-green);
+  color: white;
+  border-color: var(--excel-green);
+}
+
+.modern-button-primary:hover {
+  background: var(--excel-green-hover);
+}
+
+.modern-button-secondary {
+  background: white;
+  border-color: var(--excel-border);
+}
+
+/* Excel 风格下拉框 */
+.modern-select {
+  padding: 4px 20px 4px 6px;
+  font-size: 13px;
+  border: 1px solid var(--excel-border);
+  border-radius: 2px;
+  background: white;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%23333' d='M5 7L1 3h8z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 5px center;
+}
+
+.modern-select:hover {
+  border-color: #adadad;
+}
+
+.modern-select:focus {
+  outline: none;
+  border-color: var(--excel-green);
+}
+
+/* Excel 风格输入框 */
+.modern-input {
+  padding: 4px 6px;
+  font-size: 13px;
+  border: 1px solid var(--excel-border);
+  border-radius: 2px;
+  background: white;
+  width: 50px;
+  text-align: center;
+}
+
+.modern-input:hover {
+  border-color: #adadad;
+}
+
+.modern-input:focus {
+  outline: none;
+  border-color: var(--excel-green);
+}
+
+/* Excel 风格开关 - 简单方块 */
+.modern-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.modern-switch input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  margin: 0;
+}
+
+.switch-slider {
+  display: none;
+}
+
+.switch-label {
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+/* Excel 风格标签页 */
+.modern-tabs {
+  display: flex;
+  gap: 2px;
+  border-bottom: 2px solid var(--excel-border);
+}
+
+.modern-tab {
+  padding: 6px 14px;
+  font-size: 13px;
+  border: 1px solid transparent;
+  border-bottom: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  position: relative;
+  bottom: -2px;
+}
+
+.modern-tab:hover {
+  background: #e8e8e8;
+}
+
+.modern-tab.active {
+  background: white;
+  color: var(--excel-green);
+  border: 1px solid var(--excel-border);
+  border-bottom: 2px solid white;
+  font-weight: 600;
+}
+
+/* 内容区域 */
+.modern-content {
+  flex: 1;
+  padding: 12px;
+}
+
+/* 统计卡片 - Excel 风格 */
+.stats-card {
+  background: white;
+  border: 1px solid var(--excel-border);
+  padding: 10px 12px;
+  margin-bottom: 10px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 12px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.stat-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
+.stat-value {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.stat-value.added {
+  color: #10b981;
+}
+
+.stat-value.removed {
+  color: #ef4444;
+}
+
+.stat-value.modified {
+  color: #f59e0b;
+}

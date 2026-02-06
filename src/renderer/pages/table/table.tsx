@@ -1,5 +1,5 @@
-import { Row, Col, Table, Tooltip } from 'antd';
-import React, { useState, useEffect } from 'react';
+import { Row, Col, Table, Tooltip, Input } from 'antd';
+import React, { useState, useEffect, useMemo } from 'react';
 //redux
 import { useAppSelector, useAppDispatch } from '../../redux/hooks';
 import { RootState } from '../../redux/store';
@@ -59,14 +59,13 @@ function getTableScroll({ extraHeight, ref }: { [key: string]: any } = {}) {
 
 function setExcelData(
   diffData: any,
-  setColumns: React.Dispatch<React.SetStateAction<any[]>>,
-  setData: React.Dispatch<React.SetStateAction<any[]>>,
   left = true,
+  getRenderer?: (rowKey: string, left: boolean) => any
 ) {
   const columns: { [key: string]: { [key: string]: any } } = {};
   columns['Index'] = {
     title: 'Index',
-    width: 80,
+    width: 60,
     fixed: "left",
     align: "center",
     render: (text: string, record: { [key: string]: string | number }, index: number) => {
@@ -75,6 +74,18 @@ function setExcelData(
   };
   const datas: any[] = left ? diffData.leftData : diffData.rightData;
   const data = [];
+
+  // 先收集所有列
+  const allColumns = new Set<string>();
+  for (let i = 1; i < datas.length; i++) {
+    const itemD = datas[i];
+    Object.keys(itemD).forEach(k => allColumns.add(k));
+  }
+
+  // 计算动态列宽（自适应窗口）
+  const columnCount = allColumns.size;
+  const dynamicWidth = Math.max(80, Math.floor((window.innerWidth / 2 - 100) / columnCount));
+
   for (let i = 1; i < datas.length; i++) {
     const itemD = datas[i];
     const keys = Object.keys(itemD);
@@ -87,16 +98,15 @@ function setExcelData(
       columns[k] = {
         title: k,
         dataIndex: k,
-        width: 150,  // 默认就行
-        render: itemRenderWrap(diffData, k, left),
+        width: dynamicWidth,
+        render: getRenderer ? getRenderer(k, left) : itemRenderWrap(diffData, k, left),
         onCell: cellRenderWrap(diffData, k, left),
       };
     }
     dItem.key = i;
     data.push(dItem);
   }
-  setColumns(Object.values(columns));
-  setData(data);
+  return { columns: Object.values(columns), data };
 }
 
 function cellRenderWrap(diffData: any, rowKey: string, left = true) {
@@ -122,31 +132,44 @@ function cellRenderWrap(diffData: any, rowKey: string, left = true) {
   };
 }
 
-function itemRenderWrap(diff: diffType, rowKey: string, left = true) {
+function itemRenderWrap(diffData: any, rowKey: string, left = true) {
   return (
     text: string,
     record: { [key: string]: string | number },
     index: number
   ) => {
-    return <Tooltip placement='top' title={text}>
-      <div className='ellipsis'>{text}</div>
-    </Tooltip>
+    const value = String(text ?? '');
+    const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const v = e.target.value;
+      const line = Number(record.key);
+      if (left) {
+        diffData.leftData[line][rowKey] = v;
+      } else {
+        diffData.rightData[line][rowKey] = v;
+      }
+      const newDiff = window.electronAPI.diffArrays(diffData.leftData, diffData.rightData).diffObj;
+      Object.assign(diffData.diffObj, newDiff);
+    };
+    return (
+      <Tooltip placement='top' title={value}>
+        <Input defaultValue={value} onChange={onChange}/>
+      </Tooltip>
+    )
   };
 }
 
 function rowClassRenderWrap(diff: diffType, page: number, left: boolean) {
   return (record: any, index: number) => {
-    index = (page - 1) * MAX_PAGE_SIZE + index + 1;
-    // if (index in diff && JSON.stringify(diff[index]) !== '{}') {
-    if (index in diff && (left ? true : diff[index] )) {
-      if (left && !diff[index]) {
-        return 'diff-row-delete' + ` scroll-row-${index}`
+    const idx = Number(record.key);
+    if (idx in diff && (left ? true : diff[idx])) {
+      if (left && !diff[idx]) {
+        return 'diff-row-delete' + ` scroll-row-${idx}`
       }
       return (
-        (left ? 'diff-row-left' : 'diff-row-right') + ` scroll-row-${index}`
+        (left ? 'diff-row-left' : 'diff-row-right') + ` scroll-row-${idx}`
       );
     }
-    return 'diff-row-common' + ` scroll-row-${index}`;
+    return 'diff-row-common' + ` scroll-row-${idx}`;
   };
 }
 
@@ -220,7 +243,10 @@ export type TableProps = {
   lTitle? : string,
   rTitle? : string,
   lDatas? : { [key: string]: any },
-  rDatas? : { [key: string]: any } 
+  rDatas? : { [key: string]: any },
+  contextN?: number,
+  showContextOnly?: boolean,
+  expandIdx?: number
 }
 
 const diffOriData: {[key: string]: any} = {};
@@ -239,13 +265,55 @@ const TableDiff = (props: TableProps) => {
 
   const [leftColumns, setLeftColumns] = useState([]);
   const [leftData, setLeftData] = useState([]);
+  const [leftFullData, setLeftFullData] = useState([]);
   const [rightColumns, setRightColumns] = useState([]);
   const [rightData, setRightData] = useState([]);
+  const [rightFullData, setRightFullData] = useState([]);
 
   const [diff, setDiff] = useState<diffType>({});
   const [scrollY, setScrollY] = useState('');
 
   const [page, setPage] = useState(1); // 当前页数
+  const [expandedLines, setExpandedLines] = useState<Set<number>>(new Set());
+
+  // Memoized visible rows calculation for context folding
+  const visibleRowIndices = useMemo(() => {
+    if (!props.showContextOnly) {
+      return null; // Show all rows
+    }
+
+    const total = Math.max(leftFullData.length, rightFullData.length);
+    const visible = new Set<number>();
+    const contextN = props.contextN ?? 3;
+
+    // Add diff rows and their context
+    for (const k of Object.keys(diff)) {
+      const center = Number(k);
+      const start = Math.max(1, center - contextN);
+      const end = Math.min(total - 1, center + contextN);
+      for (let i = start; i <= end; i++) visible.add(i);
+    }
+
+    // Add manually expanded lines
+    for (const i of Array.from(expandedLines)) visible.add(i);
+
+    return visible;
+  }, [props.showContextOnly, props.contextN, leftFullData.length, rightFullData.length, diff, expandedLines]);
+
+  const buildArrayFromData = (data: any[]) => {
+    const len = data.length;
+    const arr: any[] = new Array(len);
+    for (const rec of data as any[]) {
+      const k = Number((rec as any).key);
+      const obj: any = {};
+      for (const kk of Object.keys(rec as any)) {
+        if (kk === 'key') continue;
+        obj[kk] = (rec as any)[kk];
+      }
+      arr[k] = obj;
+    }
+    return arr;
+  };
 
 
   useEffect(() => {
@@ -292,18 +360,54 @@ const TableDiff = (props: TableProps) => {
     setPage(1)
     dispatch(redux_setDiffKeys(lineKeys));
     dispatch(redux_setDiffIdx(-1));
-    setExcelData(
-      diffData,
-      setLeftColumns,
-      setLeftData,
-      true,
-    );
-    setExcelData(
-      diffData,
-      setRightColumns,
-      setRightData,
-      false,
-    );
+    const rendererFactory = (rowKey: string, leftSide: boolean) => {
+      return (
+        text: string,
+        record: { [key: string]: string | number },
+        index: number
+      ) => {
+        const value = String(text ?? '');
+        const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+          const v = e.target.value;
+          const line = Number(record.key);
+          if (leftSide) {
+            setLeftFullData(prev => {
+              const next = [...prev] as any[];
+              const idx = next.findIndex(d => Number((d as any).key) === line);
+              const item = { ...(next[idx] as any), [rowKey]: v };
+              next[idx] = item;
+              return next as any;
+            });
+          } else {
+            setRightFullData(prev => {
+              const next = [...prev] as any[];
+              const idx = next.findIndex(d => Number((d as any).key) === line);
+              const item = { ...(next[idx] as any), [rowKey]: v };
+              next[idx] = item;
+              return next as any;
+            });
+          }
+          const newLeftArr = buildArrayFromData(leftFullData as any[]);
+          const newRightArr = buildArrayFromData(rightFullData as any[]);
+          const rst = window.electronAPI.diffArrays(newLeftArr, newRightArr);
+          setDiff(rst.diffObj);
+        };
+        return (
+          <Tooltip placement='top' title={value}>
+            <Input defaultValue={value} onChange={onChange}/>
+          </Tooltip>
+        )
+      };
+    };
+    const leftPack = setExcelData(diffData, true, rendererFactory);
+    const rightPack = setExcelData(diffData, false, rendererFactory);
+    setLeftColumns(leftPack.columns);
+    setRightColumns(rightPack.columns);
+    setLeftFullData(leftPack.data);
+    setRightFullData(rightPack.data);
+    setLeftData(leftPack.data);
+    setRightData(rightPack.data);
+    setExpandedLines(new Set());
   }, [redux_sheet]);
 
   useEffect(() => {
@@ -317,6 +421,38 @@ const TableDiff = (props: TableProps) => {
       handleScroll(redux_diffIdx);
     }
   }, [redux_diffIdx]);
+
+  useEffect(() => {
+    if (!props.showContextOnly || !visibleRowIndices) {
+      setLeftData(leftFullData);
+      setRightData(rightFullData);
+      return;
+    }
+
+    const lData = (leftFullData as any[]).filter(d => visibleRowIndices.has(Number((d as any).key)));
+    const rData = (rightFullData as any[]).filter(d => visibleRowIndices.has(Number((d as any).key)));
+    setLeftData(lData as any);
+    setRightData(rData as any);
+  }, [props.showContextOnly, visibleRowIndices, leftFullData, rightFullData]);
+
+  useEffect(() => {
+    if (!props.showContextOnly) return;
+    if (props.expandIdx === undefined || props.expandIdx < 0) return;
+    const idx = props.expandIdx;
+    const keys = Object.keys(diff).map(v => Number(v)).sort((a,b)=>a-b);
+    let prev = 1;
+    let next = Math.max(leftFullData.length, rightFullData.length) - 1;
+    for (let i=0;i<keys.length;i++) {
+      if (keys[i] === idx) {
+        prev = i>0 ? keys[i-1] : 1;
+        next = i<keys.length-1 ? keys[i+1] : next;
+        break;
+      }
+    }
+    const set = new Set(expandedLines);
+    for (let i = prev; i <= next; i++) set.add(i);
+    setExpandedLines(set);
+  }, [props.expandIdx]);
 
   useEffect(() => {
     if (diffScroll !== 0) {

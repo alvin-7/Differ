@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:www.nathaniel.ai)",
+      "WebFetch(domain:json.jsdiff.com)",
+      "Bash(yarn lint:*)",
+      "Bash(npm run lint)",
+      "Bash(node:*)",
+      "Bash(npm install)",
+      "Bash(yarn add:*)",
+      "Bash(npm install:*)",
+      "Bash(grep:*)",
+      "Bash(timeout 10 npm start:*)",
+      "Bash(timeout 15 npm start:*)",
+      "Bash(npm start:*)",
+      "Bash(taskkill:*)",
+      "Bash(netstat:*)",
+      "Bash(xargs:*)",
+      "Bash(echo:*)",
+      "Bash(yarn start)",
+      "Bash(findstr:*)",
+      "Bash(npm info:*)"
+    ]
+  }
+}

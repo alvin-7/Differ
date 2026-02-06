@@ -59,3 +59,81 @@
 .diff-right-table {
   user-select: text;
 }
+
+// Virtual table styles
+.virtual-table-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.virtual-table-title {
+  padding: 10px 16px;
+  background-color: #fafafa;
+  border: 1px solid #f0f0f0;
+  border-bottom: none;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.virtual-grid {
+  border: 1px solid #f0f0f0;
+  user-select: text;
+  overflow: auto !important;
+  position: relative;
+
+  // Hide horizontal scrollbar only
+  &::-webkit-scrollbar:horizontal {
+    height: 0;
+  }
+
+  // Keep vertical scrollbar visible but thin
+  &::-webkit-scrollbar:vertical {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(0, 0, 0, 0.3);
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+}
+
+// Ensure both grids can scroll independently
+.diff-left-table {
+  pointer-events: auto;
+}
+
+.diff-right-table {
+  pointer-events: auto;
+}
+
+.diff-cell {
+  border-right: 1px solid #f0f0f0;
+  border-bottom: 1px solid #f0f0f0;
+  padding: 4px 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  user-select: text;
+}
+
+.diff-cell .ant-input {
+  border: none;
+  background: transparent;
+  padding: 0;
+}
+
+.diff-cell .ant-input:focus {
+  box-shadow: none;
+  background: white;
+  border: 1px solid #1890ff;
+}

@@ -1,6 +1,7 @@
 import * as React from 'react';
-import { Button, Layout, Menu, Row, Col, Select } from 'antd';
+import { Button, Layout, Menu, Row, Col, Select, InputNumber, Switch } from 'antd';
 import TableDiff, { TableProps } from './pages/table/table';
+import VirtualDiffTable from './pages/table/VirtualDiffTable';
 const { Option } = Select;
 
 import { useAppSelector, useAppDispatch } from './redux/hooks';
@@ -30,6 +31,10 @@ const App = () => {
   const dispatch = useAppDispatch();
 
   const [tableState, setTableState] = React.useState({} as TableProps);
+  const [contextN, setContextN] = React.useState<number>(3);
+  const [showContextOnly, setShowContextOnly] = React.useState<boolean>(false);
+  const [expandIdx, setExpandIdx] = React.useState<number>(-1);
+  const [useVirtualTable, setUseVirtualTable] = React.useState<boolean>(true);
 
   React.useEffect(() => {
     const ipc = window.electronAPI.ipcRenderer;
@@ -42,6 +47,9 @@ const App = () => {
           rTitle: excelPaths[1],
           lDatas: leftDatas,
           rDatas: rightDatas,
+          contextN,
+          showContextOnly,
+          expandIdx,
         });
       }
     });
@@ -68,9 +76,26 @@ const App = () => {
   function handleOptionChange(val: number) {
       dispatch(redux_setDiffIdx(val));
   }
+  function handleExpandCurrent() {
+    setExpandIdx(redux_diffIdx);
+    setTableState(prev => ({ ...prev, expandIdx: redux_diffIdx }));
+  }
+  function handleToggleContext(checked: boolean) {
+    setShowContextOnly(checked);
+    setTableState(prev => ({ ...prev, showContextOnly: checked }));
+  }
+  function handleContextNChange(val: number) {
+    const n = Number(val) || 0;
+    setContextN(n);
+    setTableState(prev => ({ ...prev, contextN: n }));
+  }
+  function handleShowAll() {
+    setShowContextOnly(false);
+    setTableState(prev => ({ ...prev, showContextOnly: false }));
+  }
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout style={{ minHeight: '100vh', height: '100vh', overflow: 'hidden' }}>
       <Header className="header">
         <div className="logo" />
         {redux_sheets.length && redux_diffKeys.length ? (
@@ -103,23 +128,53 @@ const App = () => {
               <Button type="primary" style={{ width: DiffButtonWidth }} onClick={onClickDiffScroll(false)}>
                 Next Diff
               </Button>
+              <Switch checked={showContextOnly} onChange={handleToggleContext} style={{ marginLeft: 12 }} />
+              <InputNumber min={0} max={100} value={contextN} onChange={handleContextNChange} style={{ width: 80, marginLeft: 8 }} />
+              <Button onClick={handleExpandCurrent} style={{ marginLeft: 8 }}>
+                展开当前段
+              </Button>
+              <Button onClick={handleShowAll} style={{ marginLeft: 8 }}>
+                显示全部
+              </Button>
+              <Switch
+                checked={useVirtualTable}
+                onChange={setUseVirtualTable}
+                style={{ marginLeft: 12 }}
+                checkedChildren="虚拟化"
+                unCheckedChildren="标准"
+              />
             </Col>
           </Row>
         ) : null}
       </Header>
-      <Content>
+      <Content style={{ overflow: 'hidden' }}>
         <Layout
           className="site-layout-background"
-          style={{ padding: '24px 0' }}
+          style={{ padding: '24px 0', overflow: 'hidden' }}
         >
-          <Content style={{ padding: '0 24px', minHeight: 280 }}>
+          <Content style={{ padding: '0 24px', minHeight: 280, overflow: 'hidden' }}>
             {tableState.lTitle ? (
-              <TableDiff
-                lTitle={tableState.lTitle}
-                rTitle={tableState.rTitle}
-                lDatas={tableState.lDatas}
-                rDatas={tableState.rDatas}
-              />
+              useVirtualTable ? (
+                <VirtualDiffTable
+                  lTitle={tableState.lTitle}
+                  rTitle={tableState.rTitle}
+                  lDatas={tableState.lDatas}
+                  rDatas={tableState.rDatas}
+                  contextN={tableState.contextN}
+                  showContextOnly={tableState.showContextOnly}
+                  expandIdx={tableState.expandIdx}
+                />
+              ) : (
+                <TableDiff
+                  lTitle={tableState.lTitle}
+                  rTitle={tableState.rTitle}
+                  lDatas={tableState.lDatas}
+                  rDatas={tableState.rDatas}
+                  contextN={tableState.contextN}
+                  showContextOnly={tableState.showContextOnly}
+                  expandIdx={tableState.expandIdx}
+                />
+              )
             ) : null}
           </Content>
         </Layout>

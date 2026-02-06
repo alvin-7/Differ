@@ -7,8 +7,11 @@ export interface IElectronAPI {
   } = {};
 
   /**
-   * diffArrays.
+   * Compares two arrays of row objects using Myers diff algorithm.
+   * Returns aligned data with differences highlighted.
    *
+   * @example
+   * diffObj format:
    *     "13": {
    *         "H": "1"   [update or add]
    *     },
@@ -28,7 +31,12 @@ export interface IElectronAPI {
   ) => {
     leftData: any[];
     rightData: any[];
-    diffObj: { [key: number]: { [key: string]: string | undefined } };
+    diffObj: { [key: number]: { [key: string]: boolean } };
+    nullLines: {
+      left: number[];
+      right: number[];
+    };
+    rowTypes: { [key: number]: 'added' | 'removed' | 'modified' };
   };
 }
 

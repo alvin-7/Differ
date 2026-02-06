@@ -1,0 +1,22 @@
+#!/bin/bash
+
+echo "========================================"
+echo "  Differ - Excel 对比工具"
+echo "  Myers Diff 统一实现版本"
+echo "========================================"
+echo ""
+echo "正在启动应用..."
+echo ""
+echo "测试文件:"
+echo "  左侧: test-data/left.xlsx"
+echo "  右侧: test-data/right.xlsx"
+echo ""
+echo "预期差异: 8处"
+echo "  - 2行修改 (单个单元格)"
+echo "  - 2行修改 (多个单元格)"
+echo "  - 1行删除"
+echo "  - 2行新增"
+echo ""
+
+cd "$(dirname "$0")"
+npm start -- --excel "test-data/left.xlsx" --excel "test-data/right.xlsx"

@@ -1,0 +1,230 @@
+// Virtual Diff Table Styles
+
+.virtual-diff-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  position: relative;
+}
+
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.loading-content {
+  background-color: white;
+  padding: 32px;
+  border-radius: 12px;
+  min-width: 320px;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.loading-text {
+  margin-top: 16px;
+  font-size: 16px;
+  color: #333;
+  font-weight: 500;
+}
+
+.collapsed-info {
+  padding: 12px 20px;
+  background: linear-gradient(to bottom, #f8f9fa, #f0f1f3);
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.collapsed-count {
+  font-size: 13px;
+  color: #666;
+  font-weight: 500;
+}
+
+.diff-tables-wrapper {
+  display: flex;
+  flex: 1;
+  width: 100%;
+  gap: 0;
+  min-height: 0;
+  position: relative;
+}
+
+.diff-table-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  background: #fff;
+  position: relative;
+
+  &:first-child {
+    border-right: 2px solid #e0e0e0;
+  }
+}
+
+.table-header {
+  padding: 14px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  border-bottom: 3px solid #5568d3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+}
+
+.diff-grid {
+  flex: 1;
+  outline: none;
+  background: #fafafa;
+  overflow: auto !important;
+  will-change: transform;
+
+  &::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 5px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 5px;
+
+    &:hover {
+      background: linear-gradient(135deg, #5568d3 0%, #6a3f8f 100%);
+    }
+  }
+
+  &::-webkit-scrollbar-corner {
+    background: #f1f1f1;
+  }
+
+  // Hide horizontal scrollbar
+  &::-webkit-scrollbar:horizontal {
+    height: 0;
+  }
+}
+
+.left-grid,
+.right-grid {
+  pointer-events: auto;
+  touch-action: auto;
+}
+
+.diff-cell {
+  border-right: 1px solid #e8e8e8;
+  border-bottom: 1px solid #e8e8e8;
+  padding: 6px 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  user-select: text;
+  background: white;
+  font-size: 13px;
+  transition: background-color 0.2s ease;
+
+  .ant-input {
+    border: none;
+    background: transparent;
+    padding: 0;
+    font-size: 13px;
+
+    &:focus {
+      box-shadow: none;
+      background: white;
+      border: 1px solid #667eea;
+      border-radius: 4px;
+      padding: 2px 6px;
+    }
+  }
+}
+
+// 行号列特殊样式
+.diff-index-cell {
+  background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%) !important;
+  color: #5a6c7d;
+  font-weight: 600;
+  border-right: 2px solid #d0d7de !important;
+  text-align: center;
+  justify-content: center;
+  position: sticky;
+  left: 0;
+  z-index: 10;
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.05);
+  padding: 6px 8px !important;
+  font-size: 12px;
+
+  &:hover {
+    background: linear-gradient(135deg, #e8ecf1 0%, #dce2e8 100%) !important;
+  }
+}
+
+// Diff highlighting styles
+.diff-row-null {
+  background-color: #f5f5f5 !important;
+  color: #999;
+}
+
+.diff-row-delete {
+  background-color: #ffebee !important;
+  color: #c62828;
+}
+
+.diff-row-add {
+  background-color: #fff9c4 !important;
+  color: #f57f17;
+}
+
+.diff-row-left-item {
+  background: linear-gradient(90deg, #fff3e0 0%, #ffe0b2 100%) !important;
+  border-left: 3px solid #ff9800;
+  font-weight: 500;
+}
+
+.diff-row-right-item {
+  background: linear-gradient(90deg, #fff9c4 0%, #fff59d 100%) !important;
+  border-left: 3px solid #fbc02d;
+  font-weight: 500;
+}
+
+.diff-row-common-item {
+  &:hover {
+    background-color: #f5f5f5;
+  }
+}
+
+.diff-row-left {
+  background-color: #e3f2fd;
+}
+
+.diff-row-right {
+  background-color: #e3f2fd;
+}
+
+.diff-row-common {
+  &:hover {
+    background-color: #fafafa;
+  }
+}

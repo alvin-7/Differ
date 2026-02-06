@@ -1,0 +1,229 @@
+/* Excel 风格表格样式 */
+
+/* Excel 表格容器 */
+.modern-table-container,
+.virtual-table-container {
+  background: white;
+  border: 1px solid #d4d4d4;
+  overflow: hidden;
+}
+
+/* Excel 表头 - 灰色背景 */
+.modern-table-header,
+.virtual-table-title {
+  background: #f2f2f2;
+  color: #333;
+  padding: 8px 12px;
+  font-weight: 600;
+  font-size: 13px;
+  border-bottom: 1px solid #d4d4d4;
+}
+
+/* 表格网格线 - 像 Excel 一样 */
+.virtual-grid {
+  border: none;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 12px;
+}
+
+.diff-cell {
+  border-right: 1px solid #e0e0e0;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 4px 8px;
+  font-size: 12px;
+  line-height: 1.4;
+  background: white;
+}
+
+/* Excel 风格的差异颜色 - 更柔和 */
+.diff-row-null {
+  background-color: #f5f5f5 !important;
+  color: #999;
+}
+
+.diff-row-delete {
+  background-color: #ffe6e6 !important;
+  border-left: 3px solid #ff4d4d;
+}
+
+.diff-row-add {
+  background-color: #e6ffe6 !important;
+  border-left: 3px solid #4dff4d;
+}
+
+.diff-row-left,
+.diff-row-right {
+  background-color: #e6f2ff !important;
+}
+
+.diff-row-left-item {
+  background-color: #fff4e6 !important;
+  font-weight: 500;
+}
+
+.diff-row-right-item {
+  background-color: #fff4e6 !important;
+  font-weight: 500;
+}
+
+.diff-row-common-item {
+  background-color: white;
+}
+
+/* 输入框 - Excel 风格 */
+.diff-cell .ant-input,
+.diff-cell input {
+  border: none;
+  background: transparent;
+  padding: 0;
+  font-size: 12px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.diff-cell .ant-input:focus,
+.diff-cell input:focus {
+  outline: 2px solid #217346;
+  background: white;
+  padding: 2px 4px;
+}
+
+/* 折叠指示器 - Excel 风格 */
+.collapsed-row-indicator {
+  background: #f9f9f9;
+  border-top: 1px solid #e0e0e0;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 6px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.collapsed-row-indicator:hover {
+  background: #f0f0f0;
+}
+
+.collapsed-row-indicator button {
+  background: white;
+  border: 1px solid #d4d4d4;
+  padding: 4px 12px;
+  font-size: 12px;
+  color: #333;
+  cursor: pointer;
+  border-radius: 2px;
+}
+
+.collapsed-row-indicator button:hover {
+  border-color: #adadad;
+  background: #f5f5f5;
+}
+
+/* 表格行悬停 - 像 Excel */
+.ant-table-tbody > tr:hover > td,
+.diff-cell:hover {
+  background-color: #f5f5f5 !important;
+}
+
+/* Excel 风格滚动条 - 只显示左侧 */
+.diff-left-table::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+.diff-left-table::-webkit-scrollbar-track {
+  background: #f5f5f5;
+}
+
+.diff-left-table::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border: 2px solid #f5f5f5;
+}
+
+.diff-left-table::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
+}
+
+.diff-left-table::-webkit-scrollbar-corner {
+  background: #f5f5f5;
+}
+
+/* 完全隐藏右侧表格的滚动条 */
+.diff-right-table {
+  overflow-y: hidden !important;
+}
+
+.diff-right-table::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Ant Design 表格滚动条 */
+.diff-left-table .ant-table-body::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+.diff-left-table .ant-table-body::-webkit-scrollbar-track {
+  background: #f5f5f5;
+}
+
+.diff-left-table .ant-table-body::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border: 2px solid #f5f5f5;
+}
+
+.diff-right-table .ant-table-body {
+  overflow-y: hidden !important;
+}
+
+.diff-right-table .ant-table-body::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+}
+
+/* Ant Design 表格优化 - Excel 风格 */
+.ant-table {
+  font-size: 12px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.ant-table-thead > tr > th {
+  background: #f2f2f2;
+  color: #333;
+  font-weight: 600;
+  font-size: 12px;
+  padding: 6px 8px;
+  border-bottom: 1px solid #d4d4d4;
+  border-right: 1px solid #e0e0e0;
+}
+
+.ant-table-tbody > tr > td {
+  padding: 4px 8px !important;
+  border-right: 1px solid #e0e0e0;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 12px;
+}
+
+.ant-table-cell {
+  user-select: text;
+}
+
+/* 表格标题 */
+.ant-table-title {
+  background: #f2f2f2;
+  padding: 8px 12px;
+  font-weight: 600;
+  font-size: 13px;
+  border-bottom: 1px solid #d4d4d4;
+}
+
+/* 移除圆角 - Excel 是方的 */
+.modern-table-container,
+.virtual-table-container,
+.ant-table {
+  border-radius: 0;
+}
+
+/* 加载动画 - 简单 */
+.loading-shimmer {
+  background: #f5f5f5;
+}
